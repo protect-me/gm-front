@@ -1,10 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
+    <v-app-bar app color="primary" dark>
       <div class="d-flex align-center">
         <v-img
           alt="Vuetify Logo"
@@ -38,15 +34,19 @@
     </v-app-bar>
 
     <v-main>
-      <router-view/>
+      <div id="nav">
+        <router-link to="/">Home</router-link> |
+        <router-link to="/login">Login</router-link>
+        <router-link to="/signUp">SignUp</router-link>
+      </div>
+      <router-view />
     </v-main>
   </v-app>
 </template>
 
 <script>
-
 export default {
-  name: 'App',
+  name: "App",
 
   data: () => ({
     //
