@@ -1,10 +1,11 @@
 <template>
-  <div class="container">
+  <div class="wrapper">
     <v-dialog v-model="dialog" persistent max-width="300px">
       <!-- transition="dialog-bottom-transition" -->
+      <!-- To Do: float btn : https://vuetifyjs.com/en/components/floating-action-buttons/#speed-dial -->
       <template v-slot:activator="{ on, attrs }">
-        <v-btn color="primary" dark v-bind="attrs" v-on="on">
-          Open Dialog
+        <v-btn color="primary" dark v-bind="attrs" v-on="on" block>
+          New Registration
         </v-btn>
       </template>
       <ExerciseForm @closeDialog="closeDialog"></ExerciseForm>
@@ -14,13 +15,17 @@
         <thead>
           <tr>
             <th class="text-left">Name</th>
-            <th class="text-left">Calories</th>
+            <th class="text-left">Category</th>
+            <th class="text-left">Target</th>
+            <th class="text-left">Note</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in desserts" :key="item.name">
-            <td>{{ item.name }}</td>
-            <td>{{ item.calories }}</td>
+          <tr v-for="exercise in exercises" :key="exercise.id">
+            <td>{{ exercise.name }}</td>
+            <td>{{ exercise.category }}</td>
+            <td>{{ exercise.target }}</td>
+            <td>{{ exercise.note }}</td>
           </tr>
         </tbody>
       </template>
@@ -35,54 +40,15 @@ export default {
   components: {
     ExerciseForm,
   },
+  created() {
+    this.$http.get("/api/exercise").then((res) => {
+      this.exercises = res.data;
+    });
+  },
   data() {
     return {
+      exercises: [],
       dialog: false,
-      notifications: false,
-      sound: true,
-      widgets: false,
-      desserts: [
-        {
-          name: "Frozen Yogurt",
-          calories: 159,
-        },
-        {
-          name: "Ice cream sandwich",
-          calories: 237,
-        },
-        {
-          name: "Eclair",
-          calories: 262,
-        },
-        {
-          name: "Cupcake",
-          calories: 305,
-        },
-        {
-          name: "Gingerbread",
-          calories: 356,
-        },
-        {
-          name: "Jelly bean",
-          calories: 375,
-        },
-        {
-          name: "Lollipop",
-          calories: 392,
-        },
-        {
-          name: "Honeycomb",
-          calories: 408,
-        },
-        {
-          name: "Donut",
-          calories: 452,
-        },
-        {
-          name: "KitKat",
-          calories: 518,
-        },
-      ],
     };
   },
   methods: {
