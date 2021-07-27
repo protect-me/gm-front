@@ -21,7 +21,28 @@ const routes = [
     path: '/signUp',
     name: 'signUp',
     component: SignUp
-  }
+  },
+  {
+    path: "/history",
+    name: "History",
+    components: {
+      default: () => import("@/views/History.vue"),
+    },
+  },
+  {
+    path: "/workout",
+    name: "workout",
+    components: {
+      default: () => import("@/views/Workout.vue"),
+    },
+  },
+  {
+    path: "/exercise",
+    name: "Exercise",
+    components: {
+      default: () => import("@/views/Exercise.vue"),
+    },
+  },
 ]
 
 const router = new VueRouter({
