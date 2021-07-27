@@ -10,7 +10,7 @@
       </v-container>
     </v-main>
 
-    <v-bottom-navigation :value="value" color="primary">
+    <v-bottom-navigation :value="value" color="primary" fixed>
       <v-btn v-for="item in nav" :key="item.title" :to="item.to">
         <v-icon>{{ item.icon }}</v-icon>
       </v-btn>

@@ -1,14 +1,15 @@
 <template>
-  <div class="container">
-    <!-- transition="dialog-bottom-transition" -->
-    <!-- <v-dialog v-model="dialog" persistent max-width="300px">
+  <div class="wrapper">
+    <v-dialog v-model="dialog" persistent max-width="300px">
+      <!-- transition="dialog-bottom-transition" -->
+      <!-- To Do: float btn : https://vuetifyjs.com/en/components/floating-action-buttons/#speed-dial -->
       <template v-slot:activator="{ on, attrs }">
-        <v-btn color="primary" dark v-bind="attrs" v-on="on">
-          Open Dialog
+        <v-btn color="primary" dark v-bind="attrs" v-on="on" block>
+          New Registration
         </v-btn>
       </template>
       <ExerciseForm @closeDialog="closeDialog"></ExerciseForm>
-    </v-dialog> -->
+    </v-dialog>
     <v-simple-table>
       <template v-slot:default>
         <thead>
@@ -33,11 +34,11 @@
 </template>
 
 <script>
-// import ExerciseForm from "@/components/ExerciseForm";
+import ExerciseForm from "@/components/ExerciseForm";
 
 export default {
   components: {
-    // ExerciseForm,
+    ExerciseForm,
   },
   created() {
     this.$http.get("/api/exercise").then((res) => {
