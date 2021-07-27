@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Index from '@/components/UserList'
-import Login from '@/components/Login'
-import SignUp from '@/components/SignUp'
+// import Login from '@/components/Login'
+// import SignUp from '@/components/SignUp'
 
 Vue.use(VueRouter)
 
@@ -12,16 +12,16 @@ const routes = [
     name: 'index',
     component: Index
   },
-  {
-    path: '/login',
-    name: 'login',
-    component: Login
-  },
-  {
-    path: '/signUp',
-    name: 'signUp',
-    component: SignUp
-  },
+  // {
+  //   path: '/login',
+  //   name: 'login',
+  //   component: Login
+  // },
+  // {
+  //   path: '/signUp',
+  //   name: 'signUp',
+  //   component: SignUp
+  // },
   {
     path: "/history",
     name: "History",

@@ -3,8 +3,8 @@
     <v-card>
       <v-card-title> 득근 | 得筋 </v-card-title>
       <!-- <v-card-subtitle> 得 얻을 (득) 筋 힘줄 (근)</v-card-subtitle> -->
-      <v-card-subtitle
-        ><strong>점진적 과부하</strong>를 관리하고 득근을 경험하세요🧙🏻‍♂️
+      <v-card-subtitle>
+        <strong>점진적 과부하</strong>를 관리하고 득근을 경험하세요🧙🏻‍♂️
       </v-card-subtitle>
       <v-card-text>
         <ul>
@@ -15,7 +15,7 @@
           <li>종목 수 증가</li>
         </ul>
       </v-card-text>
-      <v-card-actions>
+      <v-card-actions v-if="!userInfo">
         <v-spacer></v-spacer>
         <v-btn
           :outlined="signUpExpand"
@@ -28,17 +28,20 @@
           로그인
         </v-btn>
       </v-card-actions>
+      <v-card-actions v-else>
+        <v-spacer></v-spacer>
+        <v-btn color="error" @click="logout"> 로그아웃 </v-btn>
+      </v-card-actions>
       <v-expand-transition>
         <div v-show="signUpExpand">
           <v-divider></v-divider>
-          <SignUp></SignUp>
+          <SignUp @signUpSuccess="openLoginExpand"></SignUp>
         </div>
       </v-expand-transition>
       <v-expand-transition>
         <div v-show="loginExpand">
           <v-divider></v-divider>
-          <v-card-text> Login </v-card-text>
-          <!-- <LoginCard></LoginCard> -->
+          <Login @loginSuccess="loginSuccess"></Login>
         </div>
       </v-expand-transition>
     </v-card>
@@ -46,13 +49,17 @@
 </template>
 
 <script>
-// import LoginCard from "@/components/LoginCard";
-import SignUp from "@/components/SignUp";
+import { mapState } from "vuex";
+import Login from "@/components/history/Login";
+import SignUp from "@/components/history/SignUp";
 
 export default {
   components: {
-    // LoginCard,
+    Login,
     SignUp,
+  },
+  computed: {
+    ...mapState(["userInfo"]),
   },
   data() {
     return {
@@ -68,6 +75,16 @@ export default {
     openLoginExpand() {
       if (this.signUpExpand) this.signUpExpand = false;
       this.loginExpand = !this.loginExpand;
+    },
+    async loginSuccess(id) {
+      this.loginExpand = false;
+      await this.$store.dispatch("setUserInfo", id);
+    },
+    async logout() {
+      if (confirm("로그아웃하시겠습니까? 🧙🏻‍♂")) {
+        await this.$store.dispatch("setUserInfo", null);
+        alert("로그아웃되었습니다 🧙🏻‍♂");
+      }
     },
   },
 };
