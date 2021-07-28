@@ -2,6 +2,7 @@
   <div class="continaer">
     <v-card>
       <v-card-title> 득근 | 得筋 </v-card-title>
+      <v-card-subtitle> {{ userId }} | {{ userUuid }} </v-card-subtitle>
       <!-- <v-card-subtitle> 得 얻을 (득) 筋 힘줄 (근)</v-card-subtitle> -->
       <v-card-subtitle>
         <strong>점진적 과부하</strong>를 관리하고 득근을 경험하세요🧙🏻‍♂️
@@ -15,7 +16,7 @@
           <li>종목 수 증가</li>
         </ul>
       </v-card-text>
-      <v-card-actions v-if="!userInfo">
+      <v-card-actions v-if="!userUuid">
         <v-spacer></v-spacer>
         <v-btn
           :outlined="signUpExpand"
@@ -59,7 +60,7 @@ export default {
     SignUp,
   },
   computed: {
-    ...mapState(["userInfo"]),
+    ...mapState(["userId", "userUuid"]),
   },
   data() {
     return {
@@ -76,13 +77,16 @@ export default {
       if (this.signUpExpand) this.signUpExpand = false;
       this.loginExpand = !this.loginExpand;
     },
-    async loginSuccess(id) {
+    async loginSuccess(userId, userUuid) {
       this.loginExpand = false;
-      await this.$store.dispatch("setUserInfo", id);
+      const payload = {};
+      payload.userId = userId;
+      payload.userUuid = userUuid;
+      await this.$store.dispatch("setUserInfo", payload);
     },
     async logout() {
       if (confirm("로그아웃하시겠습니까? 🧙🏻‍♂")) {
-        await this.$store.dispatch("setUserInfo", null);
+        await this.$store.dispatch("resetUserInfo");
         alert("로그아웃되었습니다 🧙🏻‍♂");
       }
     },

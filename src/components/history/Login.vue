@@ -74,7 +74,7 @@ export default {
         });
         if (res.data.success == true) {
           alert(res.data.message); // 성공
-          this.$emit("loginSuccess", this.form.userId);
+          this.$emit("loginSuccess", this.form.userId, res.data.userUuid);
           this.initForm();
         } else {
           alert(res.data.message); // 실패
