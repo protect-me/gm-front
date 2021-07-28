@@ -4,8 +4,8 @@
       <v-form ref="form" v-model="valid" lazy-validation>
         <v-container>
           <v-text-field
-            v-model="form.id"
-            :rules="idRules"
+            v-model="form.userId"
+            :rules="userIdRules"
             label="아이디 | ID"
             required
           ></v-text-field>
@@ -33,11 +33,11 @@
 export default {
   data: () => ({
     form: {
-      id: "",
+      userId: "",
       password: "",
     },
     valid: true,
-    idRules: [
+    userIdRules: [
       (v) => !!v || "아이디를 정확히 입력하지 않으면 근손실이 옵니다 🧙🏻‍♂",
       (v) =>
         (v && v.length >= 5 && v.length <= 15) ||
@@ -74,7 +74,7 @@ export default {
         });
         if (res.data.success == true) {
           alert(res.data.message); // 성공
-          this.$emit("loginSuccess", this.form.id);
+          this.$emit("loginSuccess", this.form.userId);
           this.initForm();
         } else {
           alert(res.data.message); // 실패
@@ -87,7 +87,7 @@ export default {
       }
     },
     initForm() {
-      this.form.id = "";
+      this.form.userId = "";
       this.form.password = "";
     },
   },
