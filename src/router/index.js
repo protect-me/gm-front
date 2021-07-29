@@ -7,11 +7,11 @@ import Index from '@/components/UserList'
 Vue.use(VueRouter)
 
 const routes = [
-  {
-    path: '/',
-    name: 'index',
-    component: Index
-  },
+  // {
+  //   path: '/',
+  //   name: 'index',
+  //   component: Index
+  // },
   // {
   //   path: '/login',
   //   name: 'login',
@@ -30,8 +30,8 @@ const routes = [
     },
   },
   {
-    path: "/workout",
-    name: "workout",
+    path: "/",
+    name: "Workout",
     components: {
       default: () => import("@/views/Workout.vue"),
     },

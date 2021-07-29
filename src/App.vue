@@ -2,6 +2,11 @@
   <v-app>
     <v-app-bar color="white" app flat>
       <div class="title">💪🏻💪🏼💪🏽💪🏾💪🏿</div>
+      <v-spacer></v-spacer>
+      <WorkoutSheet
+        @fullscreen="BottomNavToMiddle"
+        @halfscreen="BottomNavToTop"
+      ></WorkoutSheet>
     </v-app-bar>
 
     <v-main>
@@ -10,7 +15,12 @@
       </v-container>
     </v-main>
 
-    <v-bottom-navigation :value="value" color="primary" fixed>
+    <v-bottom-navigation
+      :value="value"
+      color="primary"
+      fixed
+      :style="bottomNavStyle"
+    >
       <v-btn v-for="item in nav" :key="item.title" :to="item.to">
         <v-icon>{{ item.icon }}</v-icon>
       </v-btn>
@@ -19,7 +29,12 @@
 </template>
 
 <script>
+import WorkoutSheet from "@/components/WorkoutSheet";
+
 export default {
+  components: {
+    WorkoutSheet,
+  },
   data() {
     return {
       value: 1,
@@ -32,7 +47,7 @@ export default {
         {
           title: "workout",
           icon: "mdi-plus",
-          to: "/workout",
+          to: "/",
         },
         {
           title: "exercise",
@@ -40,13 +55,21 @@ export default {
           to: "/exercise",
         },
       ],
+      bottomNavStyle: {
+        zIndex: "6",
+      },
     };
+  },
+  methods: {
+    BottomNavToMiddle() {
+      this.bottomNavStyle.zIndex = "6";
+    },
+    BottomNavToTop() {
+      this.bottomNavStyle.zIndex = "300 !important";
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.v-app-bar {
-  /* display: none !important; */
-}
 </style>

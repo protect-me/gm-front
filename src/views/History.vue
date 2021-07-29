@@ -2,8 +2,6 @@
   <div class="continaer">
     <v-card>
       <v-card-title> 득근 | 得筋 </v-card-title>
-      <v-card-subtitle> {{ userId }} | {{ userUuid }} </v-card-subtitle>
-      <!-- <v-card-subtitle> 得 얻을 (득) 筋 힘줄 (근)</v-card-subtitle> -->
       <v-card-subtitle>
         <strong>점진적 과부하</strong>를 관리하고 득근을 경험하세요🧙🏻‍♂️
       </v-card-subtitle>
