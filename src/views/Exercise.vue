@@ -21,7 +21,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="exercise in exercises" :key="exercise.id">
+          <tr v-for="exercise in exercises" :key="exercise.exerciseUuid">
             <td>{{ exercise.name }}</td>
             <td>{{ exercise.category }}</td>
             <td>{{ exercise.target }}</td>

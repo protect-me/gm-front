@@ -4,8 +4,8 @@
       <v-form ref="form" v-model="valid" lazy-validation>
         <v-container>
           <v-text-field
-            v-model="form.id"
-            :rules="idRules"
+            v-model="form.userId"
+            :rules="userIdRules"
             label="아이디 | ID"
             required
           ></v-text-field>
@@ -46,13 +46,13 @@
 export default {
   data: () => ({
     form: {
-      id: "",
+      userId: "",
       password: "",
       passwordCheck: "",
       checkbox: false,
     },
     valid: true,
-    idRules: [
+    userIdRules: [
       // To Do : id, password 검증 추가('admin', '관리자', 한글, 기호 등 입력 막기)
       (v) => !!v || "필수 항목입니다 🧙🏻‍♂",
       (v) =>
@@ -104,7 +104,7 @@ export default {
       }
     },
     initForm() {
-      this.form.id = "";
+      this.form.userId = "";
       this.form.password = "";
       this.form.passwordCheck = "";
       this.form.checkbox = "";

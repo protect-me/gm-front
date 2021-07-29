@@ -5,7 +5,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    userInfo: ""
+    userId: "",
+    userUuid: ""
   },
   mutations: { // commit
     updateState(state, payload) {
@@ -13,11 +14,21 @@ export default new Vuex.Store({
         state[key] = payload[key]
       })
     },
+    resetUserInfo(state) {
+      state.userId = ""
+      state.userUuid = ""
+    }
   },
   actions: { // dispatch
     setUserInfo({ commit }, payload) {
-      commit('updateState', { userInfo: payload })
+      commit('updateState', {
+        userId: payload.userId,
+        userUuid: payload.userUuid
+      })
     },
+    resetUserInfo({ commit }) {
+      commit('resetUserInfo')
+    }
   },
   modules: {
   }
