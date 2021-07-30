@@ -1,36 +1,122 @@
 <template>
-  <div class="wrapper">
-    <v-dialog v-model="dialog" persistent max-width="300px">
-      <!-- transition="dialog-bottom-transition" -->
-      <!-- To Do: float btn : https://vuetifyjs.com/en/components/floating-action-buttons/#speed-dial -->
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn color="primary" dark v-bind="attrs" v-on="on" block>
-          New Registration
-        </v-btn>
-      </template>
-      <ExerciseForm @closeDialog="closeDialog"></ExerciseForm>
-    </v-dialog>
-    <v-simple-table>
-      <template v-slot:default>
-        <thead>
-          <tr>
-            <th class="text-left">Name</th>
-            <th class="text-left">Category</th>
-            <th class="text-left">Target</th>
-            <th class="text-left">Note</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="exercise in exercises" :key="exercise.exerciseUuid">
-            <td>{{ exercise.name }}</td>
-            <td>{{ exercise.category }}</td>
-            <td>{{ exercise.target }}</td>
-            <td>{{ exercise.note }}</td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
-  </div>
+  <v-data-table
+    class="exercise-data-table"
+    v-model="selected"
+    :show-select="showSelect"
+    item-key="exerciseUuid"
+    :headers="headers"
+    :items="exercisesDisplay"
+    :search="search"
+    sort-by="target"
+    hide-default-footer
+    :loading="loading"
+    :loading-text="loadingText"
+    mobile-breakpoint="1"
+    disable-pagination
+  >
+    <template v-slot:top>
+      <!-- 상단 : 검색 / NEW -->
+      <v-toolbar flat>
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="Search"
+          single-line
+          hide-details
+        ></v-text-field>
+
+        <v-spacer></v-spacer>
+        <v-divider class="mx-4" inset vertical></v-divider>
+        <v-spacer></v-spacer>
+
+        <v-dialog v-model="dialog" max-width="500px" persistant>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
+              New
+            </v-btn>
+          </template>
+          <ExerciseForm
+            :form="editedItem"
+            :formMode="formMode"
+            @initData="initData"
+            @closeDialog="closeDialog"
+            @editProcessFinished="editUserScreenData"
+          ></ExerciseForm>
+        </v-dialog>
+
+        <v-dialog v-model="dialogDelete" max-width="500px" persistent>
+          <v-card>
+            <v-card-title class="text-h6">
+              복구가 불가능합니다. <br />그래도 삭제하시겠습니까?
+            </v-card-title>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="closeDeleteDialog">
+                Cancel
+              </v-btn>
+              <v-btn color="blue darken-1" text @click="deleteItemConfirm">
+                OK
+              </v-btn>
+              <v-spacer></v-spacer>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-toolbar>
+
+      <!-- 상단 : 카테고리 / 타겟-->
+      <v-toolbar flat class="mb-2">
+        <v-select
+          :items="categories"
+          v-model="selectedCategory"
+          outlined
+          dense
+          hide-details
+          label="Category"
+        ></v-select>
+        <v-spacer></v-spacer>
+        <v-divider class="mx-4" inset vertical></v-divider>
+        <v-spacer></v-spacer>
+        <v-select
+          :items="targets"
+          v-model="selectedTarget"
+          outlined
+          hide-details
+          dense
+          label="Targets"
+        ></v-select>
+      </v-toolbar>
+    </template>
+
+    <template v-slot:[`item.name`]="{ item }">
+      <div>
+        {{ item.name }}
+      </div>
+      <div style="color: gray">
+        {{ item.note }}
+      </div>
+    </template>
+    <template v-slot:[`item.actions`]="{ item }">
+      <v-icon
+        :disabled="item.defualt"
+        small
+        class="mr-2"
+        @click="editItem(item)"
+        color="error"
+      >
+        mdi-pencil
+      </v-icon>
+      <v-icon
+        :disabled="item.defualt"
+        color="error"
+        small
+        @click="deleteItem(item)"
+      >
+        mdi-delete
+      </v-icon>
+    </template>
+
+    <template v-slot:no-data> 데이터가 없습니다 🧙🏻‍♂️ </template>
+  </v-data-table>
 </template>
 
 <script>
@@ -40,24 +126,208 @@ export default {
   components: {
     ExerciseForm,
   },
+  data: () => ({
+    exercises: [],
+    selected: [],
+    showSelect: false,
+    dialog: false,
+    dialogDelete: false,
+    loading: false,
+    loadingText: "Loading... Please wait",
+    search: "",
+    headers: [
+      {
+        text: "Name",
+        align: "start", // start, center, end
+        value: "name",
+      },
+      { text: "Category", value: "category" },
+      { text: "Target", value: "target" },
+      // { text: "Actions", value: "actions", sortable: false },
+    ],
+    selectedCategory: "전체",
+    categories: [
+      "전체",
+      "바벨",
+      "덤벨",
+      "머신",
+      "기구",
+      "케이블",
+      "밴드",
+      "보조",
+      "가중",
+      "시간",
+      "렙",
+      "기타",
+    ],
+    selectedTarget: "전체",
+    targets: [
+      "전체",
+      "가슴",
+      "등",
+      "어깨",
+      "팔",
+      "하체",
+      "코어",
+      "전신",
+      "기타",
+    ],
+    editedIndex: -1,
+    editedItem: {
+      exerciseUuid: "",
+      userUuid: "",
+      name: "",
+      category: "",
+      target: "",
+      note: "",
+      admin: 0,
+    },
+    defaultItem: {
+      exerciseUuid: "",
+      userUuid: "",
+      name: "",
+      category: "",
+      target: "",
+      note: "",
+      admin: 0,
+    },
+  }),
+
+  computed: {
+    formMode() {
+      return this.editedIndex === -1 ? "regist" : "edit";
+    },
+    exercisesDisplay() {
+      if (this.selectedCategory == "전체" && this.selectedTarget == "전체") {
+        return this.exercises;
+      } else if (
+        this.selectedCategory != "전체" &&
+        this.selectedTarget == "전체"
+      ) {
+        const result = this.exercises.filter((item) => {
+          return item.category == this.selectedCategory;
+        });
+        return result;
+      } else if (
+        this.selectedCategory == "전체" &&
+        this.selectedTarget != "전체"
+      ) {
+        const result = this.exercises.filter((item) => {
+          return item.target == this.selectedTarget;
+        });
+        return result;
+      } else {
+        const result = this.exercises.filter((item) => {
+          return (
+            item.category == this.selectedCategory &&
+            item.target == this.selectedTarget
+          );
+        });
+        return result;
+      }
+    },
+  },
+
+  // watch: {
+  //   dialog(val) {
+  //     val || this.initData("edit");
+  //   },
+  //   dialogDelete(val) {
+  //     val || this.initData("delete");
+  //   },
+  // },
+
   created() {
-    this.$http.get("/api/exercise").then((res) => {
-      this.exercises = res.data;
-    });
+    this.addAdminAction();
+    this.initialize();
   },
-  data() {
-    return {
-      exercises: [],
-      dialog: false,
-    };
-  },
+
   methods: {
+    addAdminAction() {
+      if (this.$store.state.userId == "admin") {
+        this.headers.push({
+          text: "Actions",
+          value: "actions",
+          sortable: false,
+        });
+      }
+    },
+    initialize() {
+      this.$http.get("/api/exercise").then((res) => {
+        this.exercises = res.data;
+      });
+    },
+
+    // 등록 및 수정
+    editItem(item) {
+      this.editedIndex = this.exercises.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.dialog = true;
+    },
+    editUserScreenData(newExerciseUuid) {
+      if (this.editedIndex > -1) {
+        Object.assign(this.exercises[this.editedIndex], this.editedItem); // edit
+      } else {
+        this.editedItem.exerciseUuid = newExerciseUuid;
+        this.exercises.push(this.editedItem); // regist
+      }
+      this.initData("edit");
+    },
+
+    // 삭제
+    deleteItem(item) {
+      this.editedIndex = this.exercises.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.dialogDelete = true;
+    },
+    async deleteItemConfirm() {
+      try {
+        const res = await this.$http.delete(
+          `/api/exercise/delete/${this.editedItem.exerciseUuid}`
+        );
+        if (res.data.success == true) {
+          alert(res.data.message); // 성공
+          this.exercises.splice(this.editedIndex, 1);
+        } else {
+          alert(res.data.message); // 실패
+        }
+      } catch (err) {
+        alert("Delete Failed(500)", err);
+        console.log(err);
+      } finally {
+        this.initData("delete");
+      }
+    },
+
+    // 후처리
+    initData(mode) {
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      });
+      if (mode == "edit") {
+        this.closeDialog();
+      } else {
+        this.closeDeleteDialog();
+      }
+    },
     closeDialog() {
       this.dialog = false;
+    },
+    closeDeleteDialog() {
+      this.dialogDelete = false;
     },
   },
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+.exercise-data-table {
+  th {
+    padding: 0px 5px !important;
+  }
+  td {
+    padding: 0px 5px !important;
+  }
+}
 </style>
