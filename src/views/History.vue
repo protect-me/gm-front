@@ -85,7 +85,11 @@ export default {
     async logout() {
       if (confirm("로그아웃하시겠습니까? 🧙🏻‍♂")) {
         await this.$store.dispatch("resetUserInfo");
-        alert("로그아웃되었습니다 🧙🏻‍♂");
+        // alert("로그아웃되었습니다 🧙🏻‍♂");
+        this.$store.dispatch("popToast", {
+          msg: "로그아웃되었습니다 🧙🏻‍♂",
+          color: "primary",
+        });
       }
     },
   },

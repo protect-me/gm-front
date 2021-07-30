@@ -62,7 +62,11 @@ export default {
     async validate() {
       await this.$refs.form.validate();
       if (!this.valid) {
-        alert("입력한 정보를 다시 확인해주세요 🧙🏻‍♂");
+        // alert("입력한 정보를 다시 확인해주세요 🧙🏻‍♂");
+        this.$store.dispatch("popToast", {
+          msg: `입력한 정보를 다시 확인해주세요 🧙🏻‍♂`,
+          color: "error",
+        });
       } else {
         this.login();
       }
@@ -73,14 +77,23 @@ export default {
           form: this.form,
         });
         if (res.data.success == true) {
-          alert(res.data.message); // 성공
+          this.$store.dispatch("popToast", {
+            msg: res.data.message,
+            color: "primary",
+          });
           this.$emit("loginSuccess", this.form.userId, res.data.userUuid);
           this.initForm();
         } else {
-          alert(res.data.message); // 실패
+          this.$store.dispatch("popToast", {
+            msg: res.data.message,
+            color: "error",
+          });
         }
       } catch (err) {
-        alert("Login Failed(500)", err);
+        this.$store.dispatch("popToast", {
+          msg: `Login Failed(500) ${err}`,
+          color: "error",
+        });
         console.log(err);
       } finally {
         // this.$emit("closeDialog");

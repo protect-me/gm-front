@@ -78,10 +78,18 @@ export default {
     async validate() {
       await this.$refs.form.validate();
       if (this.form.password !== this.form.passwordCheck) {
-        alert("비밀번호가 일치하지 않습니다 🧙🏻‍♂");
+        // alert("비밀번호가 일치하지 않습니다 🧙🏻‍♂");
+        this.$store.dispatch("popToast", {
+          msg: `비밀번호가 일치하지 않습니다  🧙🏻‍♂`,
+          color: "error",
+        });
         this.valid = false;
       } else if (!this.valid) {
-        alert("입력한 정보를 다시 확인해주세요 🧙🏻‍♂");
+        // alert("입력한 정보를 다시 확인해주세요 🧙🏻‍♂");
+        this.$store.dispatch("popToast", {
+          msg: `입력한 정보를 다시 확인해주세요 🧙🏻‍♂`,
+          color: "error",
+        });
       } else {
         this.signUp();
       }
@@ -91,13 +99,25 @@ export default {
       try {
         const res = await this.$http.post("/api/users/signUp", { form });
         if (res.data.success == true) {
-          alert(res.data.message); // 성공
+          // alert(res.data.message); // 성공
+          this.$store.dispatch("popToast", {
+            msg: res.data.message,
+            color: "error",
+          });
           this.$emit("signUpSuccess");
         } else {
-          alert(res.data.message); // 실패
+          // alert(res.data.message); // 실패
+          this.$store.dispatch("popToast", {
+            msg: `Regist Failed(500) ${err}`,
+            color: "error",
+          });
         }
       } catch (err) {
-        alert("Sign Up Failed(500)", err);
+        // alert("Sign Up Failed(500)", err);
+        this.$store.dispatch("popToast", {
+          msg: `Sign Up Failed(500) ${err}`,
+          color: "error",
+        });
         console.log(err);
       } finally {
         // this.$emit("closeDialog");
