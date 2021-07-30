@@ -110,18 +110,33 @@ export default {
           res = await this.$http.post("/api/exercise/edit", { form });
         }
         if (res.data.success == true) {
-          alert(res.data.message); // 성공
+          // alert(res.data.message); // 성공
+          this.$store.dispatch("popToast", {
+            msg: res.data.message,
+            color: "primary",
+          });
           newExerciseUuid = res.data.exerciseUuid;
           this.$emit("editProcessFinished", newExerciseUuid);
         } else {
-          alert(res.data.message); // 실패
+          // alert(res.data.message); // 실패
+          this.$store.dispatch("popToast", {
+            msg: res.data.message,
+            color: "error",
+          });
           this.$emit("initData", "edit");
         }
       } catch (err) {
         if (this.formMode == "regist") {
-          alert("Regist Failed(500)", err);
+          this.$store.dispatch("popToast", {
+            msg: `Regist Failed(500) ${err}`,
+            color: "error",
+          });
         } else {
-          alert("Edit Failed(500)", err);
+          // alert("Edit Failed(500)", err);
+          this.$store.dispatch("popToast", {
+            msg: `Edit Failed(500) ${err}`,
+            color: "error",
+          });
         }
         console.log(err);
         this.$emit("initData", "edit");

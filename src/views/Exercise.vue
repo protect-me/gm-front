@@ -286,13 +286,25 @@ export default {
           `/api/exercise/delete/${this.editedItem.exerciseUuid}`
         );
         if (res.data.success == true) {
-          alert(res.data.message); // 성공
+          // alert(res.data.message); // 성공
+          this.$store.dispatch("popToast", {
+            msg: res.data.message,
+            color: "error",
+          });
           this.exercises.splice(this.editedIndex, 1);
         } else {
-          alert(res.data.message); // 실패
+          // alert(res.data.message); // 실패
+          this.$store.dispatch("popToast", {
+            msg: `Regist Failed(500) ${err}`,
+            color: "error",
+          });
         }
       } catch (err) {
-        alert("Delete Failed(500)", err);
+        // alert("Delete Failed(500)", err);
+        this.$store.dispatch("popToast", {
+          msg: `Delete Failed(500) ${err}`,
+          color: "error",
+        });
         console.log(err);
       } finally {
         this.initData("delete");

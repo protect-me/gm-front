@@ -25,15 +25,19 @@
         <v-icon>{{ item.icon }}</v-icon>
       </v-btn>
     </v-bottom-navigation>
+
+    <Toast></Toast>
   </v-app>
 </template>
 
 <script>
 import WorkoutSheet from "@/components/WorkoutSheet";
+import Toast from "@/utils/Toast";
 
 export default {
   components: {
     WorkoutSheet,
+    Toast,
   },
   data() {
     return {
