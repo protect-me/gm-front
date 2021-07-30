@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      <span class="text-h5">New Exsercise</span>
+      <span class="text-h5">{{ formTitle }}</span>
     </v-card-title>
     <v-card-text>
       <v-container>
@@ -35,26 +35,45 @@
             ></v-text-field>
           </v-col>
         </v-row>
+        <v-row v-if="userId">
+          <v-col align="right"> by {{ userId }} </v-col>
+        </v-row>
       </v-container>
     </v-card-text>
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn color="blue darken-1" text @click="closeDialog">Close</v-btn>
-      <v-btn color="blue darken-1" text @click="regist">Regist</v-btn>
+      <v-btn color="blue darken-1" text @click="save">Save</v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
+  computed: {
+    ...mapState(["userId", "userUuid"]),
+    formTitle() {
+      return this.formMode === "regist" ? "New Exercise" : "Edit Exercise";
+    },
+  },
+  mounted() {},
+  props: {
+    form: {
+      type: Object,
+      default: () => ({}),
+    },
+    formMode: {
+      type: String,
+      default: "regist",
+    },
+  },
+  destroyed() {
+    console.log("ExerciseForm Destroyed");
+  },
   data() {
     return {
-      form: {
-        name: "",
-        category: "",
-        target: "",
-        note: "",
-      },
       categories: [
         "바벨",
         "덤벨",
@@ -75,20 +94,38 @@ export default {
     closeDialog() {
       this.$emit("closeDialog");
     },
-    async regist() {
+    async save() {
+      let newExerciseUuid = "";
       const form = this.form;
+      form.userId = this.$store.state.userId;
+      form.userUuid = this.$store.state.userUuid;
+      if (form.userId == "admin") {
+        form.admin = 1;
+      }
       try {
-        const res = await this.$http.post("/api/exercise/regist", { form });
+        let res = null;
+        if (this.formMode == "regist") {
+          res = await this.$http.post("/api/exercise/regist", { form });
+        } else {
+          res = await this.$http.post("/api/exercise/edit", { form });
+        }
         if (res.data.success == true) {
           alert(res.data.message); // 성공
+          newExerciseUuid = res.data.exerciseUuid;
+          this.$emit("editProcessFinished", newExerciseUuid);
         } else {
           alert(res.data.message); // 실패
+          this.$emit("initData", "edit");
         }
       } catch (err) {
-        alert("Regist Failed(500)", err);
+        if (this.formMode == "regist") {
+          alert("Regist Failed(500)", err);
+        } else {
+          alert("Edit Failed(500)", err);
+        }
         console.log(err);
+        this.$emit("initData", "edit");
       } finally {
-        this.$emit("closeDialog");
       }
     },
   },
