@@ -32,16 +32,41 @@
             <StopWatch v-if="mode == 'record'"></StopWatch>
           </v-card-subtitle>
           <v-card-text>
-            <v-container>
+            <div v-for="exercise in exercises" :key="exercise.exerciseUuid">
+              <ExerciseBlock :exercise="exercise"></ExerciseBlock>
+            </div>
+            <!-- <v-container>
               <v-row>
                 <v-col cols="12"></v-col>
               </v-row>
-            </v-container>
+            </v-container> -->
           </v-card-text>
-          <v-card-text>
-            <v-btn color="primary" block outlined> 종목 추가 </v-btn>
+          <v-card-actions style="display: flex; flex-direction: column">
+            <v-dialog v-model="exerciseDialog" fullscreen persistant>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  color="primary"
+                  block
+                  outlined
+                  @click="openExerciseDialog"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  종목 추가
+                </v-btn>
+              </template>
+              <v-card>
+                <Exercise
+                  v-if="exerciseDialog"
+                  mode="select"
+                  @selectExerciseComplete="addSelectedExercises"
+                  @closeExerciseDialog="closeExerciseDialog"
+                ></Exercise>
+              </v-card>
+            </v-dialog>
+
             <v-btn class="mt-5" color="error" block outlined> 운동 종료 </v-btn>
-          </v-card-text>
+          </v-card-actions>
           <v-card-text>
             This is a bottom sheet using the controlled by v-model instead of
             activator This is a bottom sheet using the controlled by v-model
@@ -94,6 +119,7 @@
             using the controlled by v-model instead of activator This is a
             bottom sheet using the controlled by v-model instead of activator
           </v-card-text>
+
           <!-- <v-card-actions>
           </v-card-actions> -->
         </v-card>
@@ -104,10 +130,14 @@
 
 <script>
 import StopWatch from "@/utils/StopWatch";
+import Exercise from "@/views/Exercise";
+import ExerciseBlock from "@/components/ExerciseBlock";
 
 export default {
   components: {
     StopWatch,
+    Exercise,
+    ExerciseBlock,
   },
   created() {},
   destroyed() {},
@@ -132,7 +162,8 @@ export default {
   data() {
     return {
       mode: "create", // record || create
-      test: "basic",
+      exercises: [],
+      exerciseDialog: false,
       sheet: false,
       isFullsreen: true,
       form: {
@@ -150,6 +181,16 @@ export default {
     },
     fullscreenToggle() {
       this.isFullsreen = !this.isFullsreen;
+    },
+    openExerciseDialog() {
+      this.exerciseDialog = true;
+    },
+    closeExerciseDialog() {
+      this.exerciseDialog = false;
+    },
+    addSelectedExercises(selectedExercises) {
+      this.exercises.push(...selectedExercises);
+      this.closeExerciseDialog();
     },
   },
 };

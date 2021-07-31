@@ -1,7 +1,7 @@
 <template>
   <v-data-table
     class="exercise-data-table"
-    v-model="selected"
+    v-model="selectedExercises"
     :show-select="showSelect"
     item-key="exerciseUuid"
     :headers="headers"
@@ -16,6 +16,18 @@
   >
     <template v-slot:top>
       <!-- 상단 : 검색 / NEW -->
+
+      <v-toolbar flat v-if="mode == 'select'">
+        <v-btn
+          text
+          color="secondary"
+          class="pa-0"
+          min-width="40px"
+          @click="$emit('closeExerciseDialog')"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-toolbar>
       <v-toolbar flat>
         <v-text-field
           v-model="search"
@@ -29,7 +41,12 @@
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
 
-        <v-dialog v-model="dialog" max-width="500px" persistant>
+        <v-dialog
+          v-if="mode == 'view'"
+          v-model="dialog"
+          max-width="500px"
+          persistant
+        >
           <template v-slot:activator="{ on, attrs }">
             <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
               New
@@ -43,6 +60,14 @@
             @editProcessFinished="editUserScreenData"
           ></ExerciseForm>
         </v-dialog>
+
+        <v-btn
+          v-if="mode == 'select'"
+          color="primary"
+          @click="$emit('selectExerciseComplete', selectedExercises)"
+        >
+          선택완료({{ selectedExercises.length }})
+        </v-btn>
 
         <v-dialog v-model="dialogDelete" max-width="500px" persistent>
           <v-card>
@@ -126,9 +151,15 @@ export default {
   components: {
     ExerciseForm,
   },
+  props: {
+    mode: {
+      type: String,
+      defualt: "view", // view || select
+    },
+  },
   data: () => ({
     exercises: [],
-    selected: [],
+    selectedExercises: [],
     showSelect: false,
     dialog: false,
     dialogDelete: false,
@@ -240,6 +271,9 @@ export default {
   created() {
     this.addAdminAction();
     this.initialize();
+    if (this.mode == "select") {
+      this.showSelect = true;
+    }
   },
 
   methods: {
