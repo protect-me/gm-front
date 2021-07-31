@@ -16,7 +16,6 @@
   >
     <template v-slot:top>
       <!-- 상단 : 검색 / NEW -->
-
       <v-toolbar flat v-if="mode == 'select'">
         <v-btn
           text
@@ -370,10 +369,10 @@ export default {
 <style lang="scss">
 .exercise-data-table {
   th {
-    padding: 0px 5px !important;
+    padding: 0px 10px !important;
   }
   td {
-    padding: 0px 5px !important;
+    padding: 0px 10px !important;
   }
 }
 </style>

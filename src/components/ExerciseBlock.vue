@@ -5,6 +5,11 @@
     </v-card-title>
     <v-card-subtitle align="left"> hell </v-card-subtitle>
     <v-card-text align="left"> hellhell </v-card-text>
+    <!-- <v-container>
+              <v-row>
+                <v-col cols="12"></v-col>
+              </v-row>
+            </v-container> -->
   </v-card>
 </template>
 

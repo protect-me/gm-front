@@ -13,33 +13,42 @@
     >
       <v-sheet class="text-center" :height="bottomSheetHeight">
         <v-card height="100%">
+          <v-toolbar flat> toolbar</v-toolbar>
           <v-card-title>
             <span v-if="mode == 'record'">Workout Title</span>
             <span v-else>
               <v-text-field
                 label="Routine name"
                 v-model="form.name"
+                hide-details
                 required
               ></v-text-field>
             </span>
             <v-spacer></v-spacer>
-            <v-btn @click="fullscreenToggle" outlined small color="secondary">
+            <v-btn
+              v-if="mode == 'record'"
+              @click="fullscreenToggle"
+              outlined
+              small
+              color="secondary"
+            >
               <span v-if="isFullsreen">Minimize 👇🏻</span>
               <span v-else>Maximize 👆🏻</span>
             </v-btn>
+            <v-btn v-if="mode == 'create'"></v-btn>
           </v-card-title>
           <v-card-subtitle align="left">
             <StopWatch v-if="mode == 'record'"></StopWatch>
           </v-card-subtitle>
           <v-card-text>
-            <div v-for="exercise in exercises" :key="exercise.exerciseUuid">
-              <ExerciseBlock :exercise="exercise"></ExerciseBlock>
-            </div>
-            <!-- <v-container>
-              <v-row>
-                <v-col cols="12"></v-col>
-              </v-row>
-            </v-container> -->
+            <draggable
+              v-model="exercises"
+              :options="{ group: 'exerciseBlock' }"
+            >
+              <div v-for="exercise in exercises" :key="exercise.exerciseUuid">
+                <ExerciseBlock :exercise="exercise"></ExerciseBlock>
+              </div>
+            </draggable>
           </v-card-text>
           <v-card-actions style="display: flex; flex-direction: column">
             <v-dialog v-model="exerciseDialog" fullscreen persistant>
@@ -67,58 +76,7 @@
 
             <v-btn class="mt-5" color="error" block outlined> 운동 종료 </v-btn>
           </v-card-actions>
-          <v-card-text>
-            This is a bottom sheet using the controlled by v-model instead of
-            activator This is a bottom sheet using the controlled by v-model
-            instead of activator This is a bottom sheet using the controlled by
-            v-model instead of activator This is a bottom sheet using the
-            controlled by v-model instead of activator This is a bottom sheet
-            using the controlled by v-model instead of activator This is a
-            bottom sheet using the controlled by v-model instead of activator
-            This is a bottom sheet using the controlled by v-model instead of
-            activator This is a bottom sheet using the controlled by v-model
-            instead of activator This is a bottom sheet using the controlled by
-            v-model instead of activator This is a bottom sheet using the
-            controlled by v-model instead of activator This is a bottom sheet
-            using the controlled by v-model instead of activator This is a
-            bottom sheet using the controlled by v-model instead of activator
-            This is a bottom sheet using the controlled by v-model instead of
-            activator This is a bottom sheet using the controlled by v-model
-            instead of activator This is a bottom sheet using the controlled by
-            v-model instead of activator This is a bottom sheet using the
-            controlled by v-model instead of activator This is a bottom sheet
-            using the controlled by v-model instead of activator This is a
-            bottom sheet using the controlled by v-model instead of activator
-            This is a bottom sheet using the controlled by v-model instead of
-            activator This is a bottom sheet using the controlled by v-model
-            instead of activator This is a bottom sheet using the controlled by
-            v-model instead of activator This is a bottom sheet using the
-            controlled by v-model instead of activator This is a bottom sheet
-            using the controlled by v-model instead of activator This is a
-            bottom sheet using the controlled by v-model instead of activator
-            This is a bottom sheet using the controlled by v-model instead of
-            activator This is a bottom sheet using the controlled by v-model
-            instead of activator This is a bottom sheet using the controlled by
-            v-model instead of activator This is a bottom sheet using the
-            controlled by v-model instead of activator This is a bottom sheet
-            using the controlled by v-model instead of activator This is a
-            bottom sheet using the controlled by v-model instead of activator
-            This is a bottom sheet using the controlled by v-model instead of
-            activator This is a bottom sheet using the controlled by v-model
-            activator This is a bottom sheet using the controlled by v-model
-            instead of activator This is a bottom sheet using the controlled by
-            v-model instead of activator This is a bottom sheet using the
-            controlled by v-model instead of activator This is a bottom sheet
-            using the controlled by v-model instead of activator This is a
-            bottom sheet using the controlled by v-model instead of activator
-            This is a bottom sheet using the controlled by v-model instead of
-            activator This is a bottom sheet using the controlled by v-model
-            instead of activator This is a bottom sheet using the controlled by
-            v-model instead of activator This is a bottom sheet using the
-            controlled by v-model instead of activator This is a bottom sheet
-            using the controlled by v-model instead of activator This is a
-            bottom sheet using the controlled by v-model instead of activator
-          </v-card-text>
+          <v-card-text> </v-card-text>
 
           <!-- <v-card-actions>
           </v-card-actions> -->
@@ -132,15 +90,15 @@
 import StopWatch from "@/utils/StopWatch";
 import Exercise from "@/views/Exercise";
 import ExerciseBlock from "@/components/ExerciseBlock";
+import draggable from "vuedraggable";
 
 export default {
   components: {
     StopWatch,
     Exercise,
     ExerciseBlock,
+    draggable,
   },
-  created() {},
-  destroyed() {},
   watch: {
     isFullsreen() {
       if (this.isFullsreen) {
