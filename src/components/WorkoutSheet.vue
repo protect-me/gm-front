@@ -14,18 +14,27 @@
       <v-sheet class="text-center" :height="bottomSheetHeight">
         <v-card height="100%">
           <v-card-title>
-            <span> Workout Title </span>
+            <span v-if="mode == 'record'">Workout Title</span>
+            <span v-else>
+              <v-text-field
+                label="Routine name"
+                v-model="form.name"
+                required
+              ></v-text-field>
+            </span>
             <v-spacer></v-spacer>
             <v-btn @click="fullscreenToggle" outlined small color="secondary">
               <span v-if="isFullsreen">Minimize 👇🏻</span>
               <span v-else>Maximize 👆🏻</span>
             </v-btn>
           </v-card-title>
-          <v-card-subtitle align="left"> 00:00 </v-card-subtitle>
+          <v-card-subtitle align="left">
+            <StopWatch v-if="mode == 'record'"></StopWatch>
+          </v-card-subtitle>
           <v-card-text>
             <v-container>
               <v-row>
-                <v-col cols="12"> hell</v-col>
+                <v-col cols="12"></v-col>
               </v-row>
             </v-container>
           </v-card-text>
@@ -94,9 +103,14 @@
 </template>
 
 <script>
+import StopWatch from "@/utils/StopWatch";
+
 export default {
+  components: {
+    StopWatch,
+  },
   created() {},
-  destroye() {},
+  destroyed() {},
   watch: {
     isFullsreen() {
       if (this.isFullsreen) {
@@ -117,9 +131,13 @@ export default {
   },
   data() {
     return {
+      mode: "create", // record || create
       test: "basic",
       sheet: false,
       isFullsreen: true,
+      form: {
+        name: "New Routine",
+      },
     };
   },
   methods: {
