@@ -62,6 +62,11 @@ export default {
   },
   data() {
     return {
+      hells: [
+        {
+          name: "hell",
+        },
+      ],
       signUpExpand: false,
       loginExpand: false,
     };

@@ -41,6 +41,7 @@ export default {
   },
   data() {
     return {
+      workoutSheetDialog: false,
       value: 1,
       nav: [
         {
