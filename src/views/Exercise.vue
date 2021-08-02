@@ -1,6 +1,7 @@
 <template>
   <v-data-table
     class="exercise-data-table"
+    :class="{ 'pt-3': isSelectMode }"
     v-model="selectedExercises"
     :show-select="showSelect"
     item-key="exerciseUuid"
@@ -9,25 +10,28 @@
     :search="search"
     sort-by="target"
     hide-default-footer
-    :loading="loading"
-    :loading-text="loadingText"
     mobile-breakpoint="1"
     disable-pagination
   >
+    <!-- :loading="loading"
+    :loading-text="loadingText" -->
     <template v-slot:top>
       <!-- 상단 : 검색 / NEW -->
-      <v-toolbar flat v-if="mode == 'select'">
+      <v-toolbar flat class>
         <v-btn
           text
-          color="secondary"
+          color="error"
           class="pa-0"
           min-width="40px"
           @click="$emit('closeExerciseDialog')"
         >
           <v-icon>mdi-close</v-icon>
         </v-btn>
-      </v-toolbar>
-      <v-toolbar flat>
+
+        <v-spacer></v-spacer>
+        <v-divider class="mx-3" inset vertical></v-divider>
+        <v-spacer></v-spacer>
+
         <v-text-field
           v-model="search"
           append-icon="mdi-magnify"
@@ -37,7 +41,7 @@
         ></v-text-field>
 
         <v-spacer></v-spacer>
-        <v-divider class="mx-4" inset vertical></v-divider>
+        <v-divider class="mx-3" inset vertical></v-divider>
         <v-spacer></v-spacer>
 
         <v-dialog
@@ -153,7 +157,7 @@ export default {
   props: {
     mode: {
       type: String,
-      defualt: "view", // view || select
+      default: "view", // view || select
     },
   },
   data: () => ({
@@ -224,6 +228,9 @@ export default {
   }),
 
   computed: {
+    isSelectMode() {
+      if (this.mode == "select") return true;
+    },
     formMode() {
       return this.editedIndex === -1 ? "regist" : "edit";
     },

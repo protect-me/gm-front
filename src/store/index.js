@@ -7,8 +7,9 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    userId: "",
-    userUuid: ""
+    userId: "admin",
+    userUuid: "",
+    exercises: []
   },
   mutations: { // commit
     updateState(state, payload) {
