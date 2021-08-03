@@ -1,22 +1,19 @@
 <template>
   <v-card class="elevation-1">
-    <!-- <v-card-title class="pb-0 subtitle-1 font-weight-bold">
-      {{ dataOfSet }}
-    </v-card-title> -->
     <v-card-title class="pb-0 subtitle-1 font-weight-bold">
-      {{ exercise.target }} | {{ exercise.name }}
+      <v-chip class="mr-2" color="primary" outlined small>
+        {{ exercise.target }} | {{ exercise.category }}
+      </v-chip>
       <v-spacer></v-spacer>
       <v-btn text min-width="40px" class="pa-0">
-        <!-- delete -->
         <v-icon> mdi-dots-horizontal </v-icon>
       </v-btn>
     </v-card-title>
+    <v-card-title class="py-0 subtitle-1 font-weight-bold">
+      {{ exercise.name }}
+    </v-card-title>
     <v-card-text>
-      <!-- class="elevation-1" -->
-      <v-card-subtitle align="left" class="pa-0">
-        {{ exercise.category }}
-        <!-- 이거 칩으로 바꾸자 -->
-        <span v-if="exercise.note">|</span>
+      <v-card-subtitle align="left" class="pa-0" v-if="exercise.note">
         {{ exercise.note }}
       </v-card-subtitle>
       <v-data-table
@@ -32,10 +29,10 @@
         </template>
         <template v-slot:[`item.plusWeight`]="{ item }">
           <v-text-field
-            style="display: block; width: 50px; margin: 0 auto"
+            style="display: block; width: 60px; margin: 0 auto"
             outlined
             dense
-            v-model="item.plusWeight"
+            v-model.number="item.plusWeight"
             hide-details
             reverse
             type="number"
@@ -43,8 +40,8 @@
         </template>
         <template v-slot:[`item.minusWeight`]="{ item }">
           <v-text-field
-            v-model="item.minusWeight"
-            style="display: block; width: 50px; margin: 0 auto"
+            v-model.number="item.minusWeight"
+            style="display: block; width: 60px; margin: 0 auto"
             outlined
             dense
             reverse
@@ -54,8 +51,8 @@
         </template>
         <template v-slot:[`item.time`]="{ item }">
           <v-text-field
-            v-model="item.time"
-            style="display: block; width: 50px; margin: 0 auto"
+            v-model.number="item.time"
+            style="display: block; width: 100px; margin: 0 auto"
             outlined
             dense
             reverse
@@ -65,8 +62,8 @@
         </template>
         <template v-slot:[`item.lap`]="{ item }">
           <v-text-field
-            v-model="item.lap"
-            style="display: block; width: 50px; margin: 0 auto"
+            v-model.number="item.lap"
+            style="display: block; width: 40px; margin: 0 auto"
             outlined
             dense
             reverse
@@ -104,7 +101,7 @@ export default {
   },
   mounted() {
     // 여기에서 userUuid, exerciseUuid를 들고 database에서 history를 뒤져서 가져와야할 듯
-    console.log("mounted");
+    this.initDataOfSet();
     this.checkExerciseCategory();
   },
   watch: {
@@ -114,27 +111,21 @@ export default {
         this.$refs.form.resetValidation();
       },
     },
-  },
-
-  watch: {
     dataOfSet: {
       deep: true,
       handler() {
+        this.dataOfSet.forEach((newSet) => {
+          for (const item in newSet) {
+            if (newSet[item] === "") newSet[item] = 0;
+          }
+        });
         this.$emit("updateExerciseSet", this.dataOfSet);
       },
     },
   },
   data() {
     return {
-      dataOfSet: [
-        {
-          prev: "-",
-          plusWeight: 0,
-          minusWeight: 0,
-          lap: 0,
-          time: 0,
-        },
-      ],
+      dataOfSet: [],
       exerciseType: [],
       headers: [
         {
@@ -159,6 +150,15 @@ export default {
     };
   },
   methods: {
+    initDataOfSet() {
+      this.dataOfSet.push({
+        prev: 0,
+        plusWeight: 0,
+        minusWeight: 0,
+        lap: 0,
+        time: 0,
+      });
+    },
     checkExerciseCategory() {
       switch (this.exercise.category) {
         case "바벨":
@@ -212,14 +212,11 @@ export default {
     addNewSet() {
       const lengthOfDataOfSet = this.dataOfSet.length;
       const newSet = Object.assign({}, this.dataOfSet[lengthOfDataOfSet - 1]);
-      // newSet.setCount = lengthOfDataOfSet + 1;
       this.dataOfSet.push(newSet);
-      this.$emit("updateExerciseSet", this.dataOfSet);
     },
     deleteSet(item) {
       const deleteIndex = this.dataOfSet.indexOf(item);
       this.dataOfSet.splice(this.deleteIndex, 1);
-      this.$emit("updateExerciseSet", this.dataOfSet);
     },
 
     // deleteItem(item) {
@@ -238,6 +235,12 @@ export default {
   }
   td {
     padding: 0px 10px !important;
+  }
+  .v-input__slot {
+    padding: 0 6px !important;
+  }
+  input {
+    text-align: center !important;
   }
 }
 </style>
