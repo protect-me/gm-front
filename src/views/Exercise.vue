@@ -19,6 +19,7 @@
       <!-- 상단 : 검색 / NEW -->
       <v-toolbar flat class>
         <v-btn
+          v-if="mode == 'select'"
           text
           color="error"
           class="pa-0"
@@ -28,9 +29,14 @@
           <v-icon>mdi-close</v-icon>
         </v-btn>
 
-        <v-spacer></v-spacer>
-        <v-divider class="mx-3" inset vertical></v-divider>
-        <v-spacer></v-spacer>
+        <v-spacer v-if="mode == 'select'"></v-spacer>
+        <v-divider
+          v-if="mode == 'select'"
+          class="mx-3"
+          inset
+          vertical
+        ></v-divider>
+        <v-spacer v-if="mode == 'select'"></v-spacer>
 
         <v-text-field
           v-model="search"

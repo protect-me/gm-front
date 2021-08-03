@@ -40,7 +40,13 @@
             <v-divider class="mx-3" inset vertical></v-divider>
             <v-spacer></v-spacer>
 
-            <v-btn color="primary" :disabled="!exercises.length"> 저장 </v-btn>
+            <v-btn
+              color="primary"
+              :disabled="!exercises.length"
+              @click="saveRoutine"
+            >
+              저장
+            </v-btn>
           </v-card-title>
 
           <v-card-title v-if="mode == 'record'">
@@ -99,7 +105,13 @@
                   ></Exercise>
                 </v-card>
               </v-dialog>
-              <v-btn class="mt-3" color="error" block outlined>
+              <v-btn
+                v-if="mode == 'record'"
+                class="mt-3"
+                color="error"
+                block
+                outlined
+              >
                 운동 종료
               </v-btn>
             </div>
@@ -149,6 +161,7 @@ export default {
       mode: "create", // record || create
       existence: false,
       exercises: [],
+      newRoutine: [],
       exerciseDialog: false,
       editIndex: -1,
       sheet: false,
@@ -165,7 +178,15 @@ export default {
       this.isFullsreen = true;
     },
     eraseWorkoutSheet() {
-      this.existence = false;
+      if (this.exercises > 0) {
+        if (confirm("데이터가 모두 삭제됩니다. 그래도 닫으시겠어요? 🧙🏻‍♂")) {
+          this.existence = false;
+          this.exercises = [];
+        }
+      } else {
+        this.existence = false;
+        this.exercises = [];
+      }
     },
     closeBottomSheet() {
       this.sheet = false;
@@ -184,9 +205,31 @@ export default {
       this.closeExerciseDialog();
     },
     updateExerciseSet($event, exerciseIndex) {
-      this.exercises[exerciseIndex].dataOfset = $event;
-      console.log("parent", $event, exerciseIndex);
-      console.log("2222", this.exercises);
+      this.exercises[exerciseIndex].dataOfSet = $event;
+    },
+    saveRoutine() {
+      this.exercises.forEach((exercise) => {
+        let count = 0;
+        const dataOfSet = exercise.dataOfSet;
+        for (const item in dataOfSet) {
+          const newLine = {
+            exerciseUuid: exercise.exerciseUuid,
+            count: ++count,
+            minusWeight: dataOfSet[item].minusWeight,
+            plusWeight: dataOfSet[item].plusWeight,
+            time: dataOfSet[item].time,
+            lap: dataOfSet[item].lap,
+          };
+          this.newRoutine.push(newLine);
+        }
+      });
+      this.saveProcess();
+      this.newRoutine.forEach((item) => {
+        console.log(item);
+      });
+    },
+    async saveProcess() {
+      // this.newRoutine;
     },
   },
 };
