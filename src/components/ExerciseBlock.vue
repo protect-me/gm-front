@@ -50,15 +50,27 @@
           ></v-text-field>
         </template>
         <template v-slot:[`item.time`]="{ item }">
-          <v-text-field
-            v-model.number="item.time"
-            style="display: block; width: 100px; margin: 0 auto"
-            outlined
-            dense
-            reverse
-            hide-details
-            type="number"
-          ></v-text-field>
+          <div style="display: flex">
+            <v-text-field
+              v-model.number="item.timeMin"
+              style="width: 12px; margin: 0 auto"
+              outlined
+              dense
+              reverse
+              hide-details
+              type="number"
+            ></v-text-field>
+            <div class="py-2 px-1">:</div>
+            <v-text-field
+              v-model.number="item.timeSec"
+              style="width: 12px; margin: 0 auto"
+              outlined
+              dense
+              reverse
+              hide-details
+              type="number"
+            ></v-text-field>
+          </div>
         </template>
         <template v-slot:[`item.lap`]="{ item }">
           <v-text-field
@@ -72,22 +84,21 @@
           ></v-text-field>
         </template>
         <template v-slot:[`item.actions`]="{ item }">
-          <v-icon color="error" small @click="deleteSet(item)">
+          <v-icon
+            color="error"
+            small
+            :disabled="dataOfSet.length == 1"
+            @click="deleteSet(item)"
+          >
             mdi-delete
           </v-icon>
         </template>
       </v-data-table>
+      <div>{{ exercise }}</div>
       <v-btn class="mt-3" block outlined small @click="addNewSet">
         세트 추가
       </v-btn>
     </v-card-text>
-
-    <!-- <v-card-text align="left"> hellhell </v-card-text> -->
-    <!-- <v-container>
-              <v-row>
-                <v-col cols="12"></v-col>
-              </v-row>
-            </v-container> -->
   </v-card>
 </template>
 
@@ -101,10 +112,18 @@ export default {
   },
   mounted() {
     // 여기에서 userUuid, exerciseUuid를 들고 database에서 history를 뒤져서 가져와야할 듯
+    console.log("mounted");
     this.initDataOfSet();
-    this.checkExerciseCategory();
+    this.initHeader();
   },
   watch: {
+    exercise: {
+      deep: true,
+      handler() {
+        console.log("child - exercise - changed");
+        this.initHeader();
+      },
+    },
     form: {
       deep: true,
       handler() {
@@ -114,12 +133,14 @@ export default {
     dataOfSet: {
       deep: true,
       handler() {
+        console.log("watch update");
         this.dataOfSet.forEach((newSet) => {
           for (const item in newSet) {
             if (newSet[item] === "") newSet[item] = 0;
           }
         });
         this.$emit("updateExerciseSet", this.dataOfSet);
+        this.$forceUpdate();
       },
     },
   },
@@ -127,39 +148,25 @@ export default {
     return {
       dataOfSet: [],
       exerciseType: [],
-      headers: [
-        {
-          text: "Set",
-          align: "center", // start, center, end
-          value: "setCount",
-          sortable: false,
-        },
-        {
-          text: "Prev",
-          align: "center",
-          value: "prev",
-          sortable: false,
-        },
-        {
-          text: "X",
-          align: "center",
-          value: "actions",
-          sortable: false,
-        },
-      ],
+      headers: [],
     };
   },
   methods: {
     initDataOfSet() {
+      console.log("init Data");
       this.dataOfSet.push({
         prev: 0,
         plusWeight: 0,
         minusWeight: 0,
         lap: 0,
-        time: 0,
+        timeMin: 0,
+        timeSec: 0,
       });
     },
     checkExerciseCategory() {
+      console.log("child - init - exerciseType");
+      this.exerciseType.length = 0;
+      console.log(this.exerciseType);
       switch (this.exercise.category) {
         case "바벨":
         case "덤벨":
@@ -187,11 +194,34 @@ export default {
           this.exerciseType.push("lap");
           break;
       }
-      this.addHeader();
     },
-    addHeader() {
+    initHeader() {
+      console.log("child - init - header");
+      this.headers = [
+        {
+          text: "Set",
+          align: "center", // start, center, end
+          value: "setCount",
+          sortable: false,
+        },
+        {
+          text: "Prev",
+          align: "center",
+          value: "prev",
+          sortable: false,
+        },
+        {
+          text: "X",
+          align: "center",
+          value: "actions",
+          sortable: false,
+        },
+      ];
+      console.log(this.Headers);
+
+      this.checkExerciseCategory();
+
       this.exerciseType.forEach((type) => {
-        // this.headers.push({
         this.headers.splice(this.headers.length - 1, 0, {
           text: this.replacText(type),
           align: "center",
@@ -215,6 +245,7 @@ export default {
       this.dataOfSet.push(newSet);
     },
     deleteSet(item) {
+      if (this.dataOfSet.length == 1) return;
       const deleteIndex = this.dataOfSet.indexOf(item);
       this.dataOfSet.splice(this.deleteIndex, 1);
     },

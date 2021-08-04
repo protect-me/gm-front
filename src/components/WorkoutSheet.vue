@@ -43,7 +43,7 @@
             <v-btn
               color="primary"
               :disabled="!exercises.length"
-              @click="saveRoutine"
+              @click="savePreProcessing"
             >
               저장
             </v-btn>
@@ -69,6 +69,7 @@
           <v-card-text style="overflow-y: scroll; height: calc(100vh - 80px)">
             <draggable
               v-model="exercises"
+              @change="$set(exercises)"
               :options="{ group: 'exerciseBlock' }"
             >
               <div
@@ -81,6 +82,19 @@
                 ></ExerciseBlock>
               </div>
             </draggable>
+            <div>
+              {{ exercises }}
+            </div>
+            <!-- <div
+              v-for="(exercise, exerciseIndex) in exercises"
+              :key="exerciseIndex"
+            >
+              {{ exercise.dataOfSet.plusWeight }} |
+              {{ exercise.dataOfSet.minusWeight }} |
+              {{ exercise.dataOfSet.lap }} | {{ exercise.dataOfSet.timeMin }} |
+              {{ exercise.dataOfSet.timeSec }}
+            </div> -->
+
             <div style="display: flex; flex-direction: column">
               <v-dialog v-model="exerciseDialog" fullscreen persistant>
                 <template v-slot:activator="{ on, attrs }">
@@ -162,6 +176,10 @@ export default {
       existence: false,
       exercises: [],
       newRoutine: [],
+      testRoutine: {
+        name: "hell",
+        age: 30,
+      },
       exerciseDialog: false,
       editIndex: -1,
       sheet: false,
@@ -205,31 +223,74 @@ export default {
       this.closeExerciseDialog();
     },
     updateExerciseSet($event, exerciseIndex) {
+      console.log("parent updated", this.exercises[exerciseIndex]);
       this.exercises[exerciseIndex].dataOfSet = $event;
+      this.$forceUpdate();
+      // this.exercises[exercisesIndex].splice(indexOfItem, 1, event);
+      // this.$set(this.exercises[exerciseIndex], dataOfSet, $event);
     },
-    saveRoutine() {
+    savePreProcessing() {
+      const userUuid = this.$store.state.userUuid;
+      let countOfExercise = 0;
       this.exercises.forEach((exercise) => {
-        let count = 0;
+        ++countOfExercise;
+        let countOfSet = 0;
         const dataOfSet = exercise.dataOfSet;
         for (const item in dataOfSet) {
-          const newLine = {
-            exerciseUuid: exercise.exerciseUuid,
-            count: ++count,
-            minusWeight: dataOfSet[item].minusWeight,
-            plusWeight: dataOfSet[item].plusWeight,
-            time: dataOfSet[item].time,
-            lap: dataOfSet[item].lap,
-          };
+          const newLine = [];
+          newLine.push(
+            userUuid,
+            exercise.exerciseUuid,
+            countOfExercise,
+            ++countOfSet,
+            dataOfSet[item].plusWeight,
+            dataOfSet[item].minusWeight,
+            dataOfSet[item].lap,
+            dataOfSet[item].timeMin,
+            dataOfSet[item].timeSec
+          );
           this.newRoutine.push(newLine);
         }
       });
-      this.saveProcess();
+      // test print
       this.newRoutine.forEach((item) => {
         console.log(item);
       });
+      this.save();
     },
-    async saveProcess() {
-      // this.newRoutine;
+    async save() {
+      try {
+        // Test Get
+        // const userUuid = this.$store.state.userUuid;
+        // const res = await this.$http.get(`/api/routine/${userUuid}`);
+        const newRoutine = this.newRoutine;
+        const res = await this.$http.post(`/api/routine/regist`, {
+          newRoutine,
+        });
+        if (res.data.success == true) {
+          this.$store.dispatch("popToast", {
+            msg: res.data.message,
+            color: "primary",
+          });
+          console.log(res.data.message);
+          this.exercises = [];
+          this.eraseWorkoutSheet();
+        } else {
+          this.$store.dispatch("popToast", {
+            msg: res.data.message,
+            color: "error",
+          });
+          console.log(res.data.message);
+        }
+      } catch (err) {
+        this.$store.dispatch("popToast", {
+          msg: `Regist Failed(500) ${err}`,
+          color: "error",
+        });
+        console.log(err);
+      } finally {
+        this.newRoutine = [];
+      }
     },
   },
 };
