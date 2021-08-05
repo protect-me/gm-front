@@ -17,15 +17,16 @@
         {{ exercise.note }}
       </v-card-subtitle>
       <v-data-table
+        :cKey="cKey"
         class="exercise-block-data-table"
         :headers="headers"
-        :items="dataOfSet"
+        :items="exercise.dataOfSet"
         mobile-breakpoint="1"
         disable-pagination
         hide-default-footer
       >
         <template v-slot:[`item.setCount`]="{ item }">
-          {{ dataOfSet.indexOf(item) + 1 }}
+          {{ exercise.dataOfSet.indexOf(item) + 1 }}
         </template>
         <template v-slot:[`item.plusWeight`]="{ item }">
           <v-text-field
@@ -36,6 +37,7 @@
             hide-details
             reverse
             type="number"
+            @input="emitData"
           ></v-text-field>
         </template>
         <template v-slot:[`item.minusWeight`]="{ item }">
@@ -47,18 +49,33 @@
             reverse
             hide-details
             type="number"
+            @input="emitData"
           ></v-text-field>
         </template>
         <template v-slot:[`item.time`]="{ item }">
-          <v-text-field
-            v-model.number="item.time"
-            style="display: block; width: 100px; margin: 0 auto"
-            outlined
-            dense
-            reverse
-            hide-details
-            type="number"
-          ></v-text-field>
+          <div style="display: flex">
+            <v-text-field
+              v-model.number="item.timeMin"
+              style="width: 12px; margin: 0 auto"
+              outlined
+              dense
+              reverse
+              hide-details
+              type="number"
+              @input="emitData"
+            ></v-text-field>
+            <div class="py-2 px-1">:</div>
+            <v-text-field
+              v-model.number="item.timeSec"
+              style="width: 12px; margin: 0 auto"
+              outlined
+              dense
+              reverse
+              hide-details
+              type="number"
+              @input="emitData"
+            ></v-text-field>
+          </div>
         </template>
         <template v-slot:[`item.lap`]="{ item }">
           <v-text-field
@@ -69,10 +86,16 @@
             reverse
             hide-details
             type="number"
+            @input="emitData"
           ></v-text-field>
         </template>
         <template v-slot:[`item.actions`]="{ item }">
-          <v-icon color="error" small @click="deleteSet(item)">
+          <v-icon
+            color="error"
+            small
+            :disabled="exercise.dataOfSet.length == 1"
+            @click="deleteSet(item)"
+          >
             mdi-delete
           </v-icon>
         </template>
@@ -81,13 +104,6 @@
         세트 추가
       </v-btn>
     </v-card-text>
-
-    <!-- <v-card-text align="left"> hellhell </v-card-text> -->
-    <!-- <v-container>
-              <v-row>
-                <v-col cols="12"></v-col>
-              </v-row>
-            </v-container> -->
   </v-card>
 </template>
 
@@ -98,68 +114,50 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    cKey: {
+      type: Number,
+      default: 0,
+    },
   },
   mounted() {
     // 여기에서 userUuid, exerciseUuid를 들고 database에서 history를 뒤져서 가져와야할 듯
     this.initDataOfSet();
-    this.checkExerciseCategory();
+    this.initHeader();
   },
   watch: {
-    form: {
-      deep: true,
-      handler() {
-        this.$refs.form.resetValidation();
-      },
+    cKey() {
+      console.log("watch ckey updated");
+      this.$forceUpdate;
     },
-    dataOfSet: {
+    exercise: {
       deep: true,
       handler() {
-        this.dataOfSet.forEach((newSet) => {
-          for (const item in newSet) {
-            if (newSet[item] === "") newSet[item] = 0;
-          }
-        });
-        this.$emit("updateExerciseSet", this.dataOfSet);
+        console.log("watch datas => update parent");
+        this.initHeader();
+        this.$forceUpdate();
       },
     },
   },
   data() {
     return {
-      dataOfSet: [],
       exerciseType: [],
-      headers: [
-        {
-          text: "Set",
-          align: "center", // start, center, end
-          value: "setCount",
-          sortable: false,
-        },
-        {
-          text: "Prev",
-          align: "center",
-          value: "prev",
-          sortable: false,
-        },
-        {
-          text: "X",
-          align: "center",
-          value: "actions",
-          sortable: false,
-        },
-      ],
+      headers: [],
     };
   },
   methods: {
     initDataOfSet() {
-      this.dataOfSet.push({
+      this.exercise.dataOfSet = [];
+      this.exercise.dataOfSet.push({
         prev: 0,
         plusWeight: 0,
         minusWeight: 0,
         lap: 0,
-        time: 0,
+        timeMin: 0,
+        timeSec: 0,
       });
     },
     checkExerciseCategory() {
+      this.exerciseType.length = 0;
       switch (this.exercise.category) {
         case "바벨":
         case "덤벨":
@@ -187,11 +185,32 @@ export default {
           this.exerciseType.push("lap");
           break;
       }
-      this.addHeader();
     },
-    addHeader() {
+    initHeader() {
+      this.headers = [
+        {
+          text: "Set",
+          align: "center", // start, center, end
+          value: "setCount",
+          sortable: false,
+        },
+        {
+          text: "Prev",
+          align: "center",
+          value: "prev",
+          sortable: false,
+        },
+        {
+          text: "X",
+          align: "center",
+          value: "actions",
+          sortable: false,
+        },
+      ];
+
+      this.checkExerciseCategory();
+
       this.exerciseType.forEach((type) => {
-        // this.headers.push({
         this.headers.splice(this.headers.length - 1, 0, {
           text: this.replacText(type),
           align: "center",
@@ -210,20 +229,26 @@ export default {
       }
     },
     addNewSet() {
-      const lengthOfDataOfSet = this.dataOfSet.length;
-      const newSet = Object.assign({}, this.dataOfSet[lengthOfDataOfSet - 1]);
-      this.dataOfSet.push(newSet);
+      const lastOfDataOfSet = this.exercise.dataOfSet.length - 1;
+      const newSet = Object.assign(
+        {},
+        this.exercise.dataOfSet[lastOfDataOfSet]
+      );
+      this.exercise.dataOfSet.push(newSet);
+      const refresh = JSON.parse(JSON.stringify(this.exercise.dataOfSet));
+      this.$emit("updateExerciseSet", refresh);
+      this.$forceUpdate;
     },
     deleteSet(item) {
-      const deleteIndex = this.dataOfSet.indexOf(item);
-      this.dataOfSet.splice(this.deleteIndex, 1);
+      if (this.exercise.dataOfSet.length == 1) return;
+      const deleteIndex = this.exercise.dataOfSet.indexOf(item);
+      this.exercise.dataOfSet.splice(deleteIndex, 1);
+      const refresh = JSON.parse(JSON.stringify(this.exercise.dataOfSet));
+      this.$emit("updateExerciseSet", refresh);
     },
-
-    // deleteItem(item) {
-    //   this.editedItem = Object.assign({}, item);
-    //     this.initData("delete");
-    //   }
-    // },
+    emitData() {
+      this.$emit("updateExerciseSet", this.exercise.dataOfSet);
+    },
   },
 };
 </script>
