@@ -67,33 +67,15 @@
           </v-card-subtitle>
 
           <v-card-text style="overflow-y: scroll; height: calc(100vh - 80px)">
-            <draggable
-              v-model="exercises"
-              @change="$set(exercises)"
-              :options="{ group: 'exerciseBlock' }"
-            >
-              <div
+            <draggable v-model="exercises" @change="updateCKey">
+              <ExerciseBlock
                 v-for="(exercise, exerciseIndex) in exercises"
                 :key="exerciseIndex"
-              >
-                <ExerciseBlock
-                  :exercise="exercise"
-                  @updateExerciseSet="updateExerciseSet($event, exerciseIndex)"
-                ></ExerciseBlock>
-              </div>
+                :exercise="exercise"
+                :cKey="cKey"
+                @updateExerciseSet="updateExerciseSet($event, exerciseIndex)"
+              ></ExerciseBlock>
             </draggable>
-            <div>
-              {{ exercises }}
-            </div>
-            <!-- <div
-              v-for="(exercise, exerciseIndex) in exercises"
-              :key="exerciseIndex"
-            >
-              {{ exercise.dataOfSet.plusWeight }} |
-              {{ exercise.dataOfSet.minusWeight }} |
-              {{ exercise.dataOfSet.lap }} | {{ exercise.dataOfSet.timeMin }} |
-              {{ exercise.dataOfSet.timeSec }}
-            </div> -->
 
             <div style="display: flex; flex-direction: column">
               <v-dialog v-model="exerciseDialog" fullscreen persistant>
@@ -130,9 +112,6 @@
               </v-btn>
             </div>
           </v-card-text>
-
-          <!-- <v-card-actions>
-          </v-card-actions> -->
         </v-card>
       </v-sheet>
     </v-bottom-sheet>
@@ -172,6 +151,7 @@ export default {
   },
   data() {
     return {
+      cKey: 0,
       mode: "create", // record || create
       existence: false,
       exercises: [],
@@ -190,6 +170,11 @@ export default {
     };
   },
   methods: {
+    updateCKey() {
+      this.cKey++;
+      console.log("updateCkeys", this.cKey);
+      this.$forceUpdate;
+    },
     openBottomSheet() {
       this.sheet = true;
       this.existence = true;
@@ -225,6 +210,7 @@ export default {
     updateExerciseSet($event, exerciseIndex) {
       console.log("parent updated", this.exercises[exerciseIndex]);
       this.exercises[exerciseIndex].dataOfSet = $event;
+      this.updateCKey();
       this.$forceUpdate();
       // this.exercises[exercisesIndex].splice(indexOfItem, 1, event);
       // this.$set(this.exercises[exerciseIndex], dataOfSet, $event);
