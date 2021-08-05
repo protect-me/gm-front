@@ -77,6 +77,10 @@
               ></ExerciseBlock>
             </draggable>
 
+            <div>
+              {{ exercises }}
+            </div>
+
             <div style="display: flex; flex-direction: column">
               <v-dialog v-model="exerciseDialog" fullscreen persistant>
                 <template v-slot:activator="{ on, attrs }">
@@ -172,8 +176,6 @@ export default {
   methods: {
     updateCKey() {
       this.cKey++;
-      console.log("updateCkeys", this.cKey);
-      this.$forceUpdate;
     },
     openBottomSheet() {
       this.sheet = true;
@@ -208,12 +210,8 @@ export default {
       this.closeExerciseDialog();
     },
     updateExerciseSet($event, exerciseIndex) {
-      console.log("parent updated", this.exercises[exerciseIndex]);
       this.exercises[exerciseIndex].dataOfSet = $event;
       this.updateCKey();
-      this.$forceUpdate();
-      // this.exercises[exercisesIndex].splice(indexOfItem, 1, event);
-      // this.$set(this.exercises[exerciseIndex], dataOfSet, $event);
     },
     savePreProcessing() {
       const userUuid = this.$store.state.userUuid;

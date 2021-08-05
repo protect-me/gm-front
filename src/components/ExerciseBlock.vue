@@ -103,6 +103,9 @@
       <v-btn class="mt-3" block outlined small @click="addNewSet">
         세트 추가
       </v-btn>
+      <div>
+        {{ exercise.dataOfSet }}
+      </div>
     </v-card-text>
   </v-card>
 </template>
@@ -125,16 +128,10 @@ export default {
     this.initHeader();
   },
   watch: {
-    cKey() {
-      console.log("watch ckey updated");
-      this.$forceUpdate;
-    },
     exercise: {
       deep: true,
       handler() {
-        console.log("watch datas => update parent");
         this.initHeader();
-        this.$forceUpdate();
       },
     },
   },
@@ -155,6 +152,7 @@ export default {
         timeMin: 0,
         timeSec: 0,
       });
+      this.emitData();
     },
     checkExerciseCategory() {
       this.exerciseType.length = 0;
@@ -212,14 +210,14 @@ export default {
 
       this.exerciseType.forEach((type) => {
         this.headers.splice(this.headers.length - 1, 0, {
-          text: this.replacText(type),
+          text: this.replaceText(type),
           align: "center",
           value: type,
           sortable: false,
         });
       });
     },
-    replacText(type) {
+    replaceText(type) {
       if (type == "plusWeight") {
         return "+kg";
       } else if (type == "minusWeight") {
@@ -237,7 +235,6 @@ export default {
       this.exercise.dataOfSet.push(newSet);
       const refresh = JSON.parse(JSON.stringify(this.exercise.dataOfSet));
       this.$emit("updateExerciseSet", refresh);
-      this.$forceUpdate;
     },
     deleteSet(item) {
       if (this.exercise.dataOfSet.length == 1) return;
