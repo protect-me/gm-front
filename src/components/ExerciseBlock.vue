@@ -1,7 +1,7 @@
 <template>
   <v-card class="elevation-1">
     <v-card-title class="pb-0 subtitle-1 font-weight-bold">
-      <v-chip class="mr-2" color="primary" outlined small>
+      <v-chip class="mr-2 grab-area" color="primary" outlined small>
         {{ exercise.target }} | {{ exercise.category }}
       </v-chip>
       <v-spacer></v-spacer>
@@ -10,13 +10,18 @@
       </v-btn>
     </v-card-title>
     <v-card-title class="py-0 subtitle-1 font-weight-bold">
-      {{ exercise.name }}
+      <span class="grab-area">
+        {{ exercise.name }}
+      </span>
     </v-card-title>
     <v-card-text>
       <v-card-subtitle align="left" class="pa-0" v-if="exercise.note">
-        {{ exercise.note }}
+        <span class="grab-area">
+          {{ exercise.note }}
+        </span>
       </v-card-subtitle>
       <v-data-table
+        v-show="tableVisiblity"
         :cKey="cKey"
         class="exercise-block-data-table"
         :headers="headers"
@@ -100,12 +105,16 @@
           </v-icon>
         </template>
       </v-data-table>
-      <v-btn class="mt-3" block outlined small @click="addNewSet">
+      <v-btn
+        v-show="tableVisiblity"
+        class="mt-3"
+        block
+        outlined
+        small
+        @click="addNewSet"
+      >
         세트 추가
       </v-btn>
-      <div>
-        {{ exercise.dataOfSet }}
-      </div>
     </v-card-text>
   </v-card>
 </template>
@@ -120,6 +129,10 @@ export default {
     cKey: {
       type: Number,
       default: 0,
+    },
+    tableVisiblity: {
+      type: Boolean,
+      default: true,
     },
   },
   mounted() {

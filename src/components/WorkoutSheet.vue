@@ -67,20 +67,22 @@
           </v-card-subtitle>
 
           <v-card-text style="overflow-y: scroll; height: calc(100vh - 80px)">
-            <draggable v-model="exercises" @change="updateCKey">
+            <draggable
+              v-model="exercises"
+              :options="{ handle: '.grab-area' }"
+              @change="updateCKey"
+              @start="tableVisiblity = false"
+              @end="tableVisiblity = true"
+            >
               <ExerciseBlock
                 v-for="(exercise, exerciseIndex) in exercises"
                 :key="exerciseIndex"
                 :exercise="exercise"
                 :cKey="cKey"
+                :tableVisiblity="tableVisiblity"
                 @updateExerciseSet="updateExerciseSet($event, exerciseIndex)"
               ></ExerciseBlock>
             </draggable>
-
-            <div>
-              {{ exercises }}
-            </div>
-
             <div style="display: flex; flex-direction: column">
               <v-dialog v-model="exerciseDialog" fullscreen persistant>
                 <template v-slot:activator="{ on, attrs }">
@@ -156,6 +158,7 @@ export default {
   data() {
     return {
       cKey: 0,
+      tableVisiblity: true,
       mode: "create", // record || create
       existence: false,
       exercises: [],
