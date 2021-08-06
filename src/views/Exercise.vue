@@ -73,7 +73,7 @@
         <v-btn
           v-if="mode == 'select'"
           color="primary"
-          @click="$emit('selectExerciseComplete', selectedExercises)"
+          @click="selectExerciseComplete"
         >
           선택완료({{ selectedExercises.length }})
         </v-btn>
@@ -289,6 +289,11 @@ export default {
   },
 
   methods: {
+    initialize() {
+      this.$http.get("/api/exercise").then((res) => {
+        this.exercises = res.data.rows;
+      });
+    },
     addAdminAction() {
       if (this.$store.state.userId == "admin") {
         this.headers.push({
@@ -298,10 +303,13 @@ export default {
         });
       }
     },
-    initialize() {
-      this.$http.get("/api/exercise").then((res) => {
-        this.exercises = res.data;
+
+    selectExerciseComplete() {
+      this.selectedExercises.forEach((item) => {
+        item.dataOfSet = [];
       });
+      this.$store.dispatch("setExercises", this.selectedExercises);
+      this.$emit("closeExerciseDialog");
     },
 
     // 등록 및 수정

@@ -67,34 +67,14 @@
           </v-card-subtitle>
 
           <v-card-text style="overflow-y: scroll; height: calc(100vh - 80px)">
-            <draggable
-              v-model="exercises"
-              @change="$set(exercises)"
-              :options="{ group: 'exerciseBlock' }"
-            >
-              <div
-                v-for="(exercise, exerciseIndex) in exercises"
+            <draggable v-model="$store.state.exercises" @change="updateCKey">
+              <ExerciseBlock
+                v-for="(exercise, exerciseIndex) in $store.state.exercises"
                 :key="exerciseIndex"
-              >
-                <ExerciseBlock
-                  :exercise="exercise"
-                  @updateExerciseSet="updateExerciseSet($event, exerciseIndex)"
-                ></ExerciseBlock>
-              </div>
+                :index="exerciseIndex"
+                :cKey="cKey"
+              ></ExerciseBlock>
             </draggable>
-            <div>
-              {{ exercises }}
-            </div>
-            <!-- <div
-              v-for="(exercise, exerciseIndex) in exercises"
-              :key="exerciseIndex"
-            >
-              {{ exercise.dataOfSet.plusWeight }} |
-              {{ exercise.dataOfSet.minusWeight }} |
-              {{ exercise.dataOfSet.lap }} | {{ exercise.dataOfSet.timeMin }} |
-              {{ exercise.dataOfSet.timeSec }}
-            </div> -->
-
             <div style="display: flex; flex-direction: column">
               <v-dialog v-model="exerciseDialog" fullscreen persistant>
                 <template v-slot:activator="{ on, attrs }">
@@ -114,7 +94,6 @@
                   <Exercise
                     v-if="exerciseDialog"
                     mode="select"
-                    @selectExerciseComplete="addSelectedExercises"
                     @closeExerciseDialog="closeExerciseDialog"
                   ></Exercise>
                 </v-card>
@@ -162,6 +141,14 @@ export default {
     },
   },
   computed: {
+    exercises: {
+      get() {
+        return this.$store.state.exercises;
+      },
+      set(value) {
+        this.$store.dispatch("setExercises", value);
+      },
+    },
     bottomSheetHeight() {
       if (this.isFullsreen) {
         return "100vh";
@@ -172,14 +159,10 @@ export default {
   },
   data() {
     return {
+      cKey: 0,
       mode: "create", // record || create
       existence: false,
-      exercises: [],
       newRoutine: [],
-      testRoutine: {
-        name: "hell",
-        age: 30,
-      },
       exerciseDialog: false,
       editIndex: -1,
       sheet: false,
@@ -190,6 +173,11 @@ export default {
     };
   },
   methods: {
+    updateCKey() {
+      console.log("ckey update", this.cKey);
+      this.cKey++;
+      this.$forceUpdate;
+    },
     openBottomSheet() {
       this.sheet = true;
       this.existence = true;
@@ -217,17 +205,6 @@ export default {
     },
     closeExerciseDialog() {
       this.exerciseDialog = false;
-    },
-    addSelectedExercises(selectedExercises) {
-      this.exercises.push(...selectedExercises);
-      this.closeExerciseDialog();
-    },
-    updateExerciseSet($event, exerciseIndex) {
-      console.log("parent updated", this.exercises[exerciseIndex]);
-      this.exercises[exerciseIndex].dataOfSet = $event;
-      this.$forceUpdate();
-      // this.exercises[exercisesIndex].splice(indexOfItem, 1, event);
-      // this.$set(this.exercises[exerciseIndex], dataOfSet, $event);
     },
     savePreProcessing() {
       const userUuid = this.$store.state.userUuid;

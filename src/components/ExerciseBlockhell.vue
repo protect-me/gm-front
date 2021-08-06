@@ -19,13 +19,13 @@
       <v-data-table
         class="exercise-block-data-table"
         :headers="headers"
-        :items="$store.state.exercises[this.index].dataOfSet"
+        :items="dataOfSet"
         mobile-breakpoint="1"
         disable-pagination
         hide-default-footer
       >
         <template v-slot:[`item.setCount`]="{ item }">
-          {{ exercise.dataOfSet.indexOf(item) + 1 }}
+          {{ dataOfSet.indexOf(item) + 1 }}
         </template>
         <template v-slot:[`item.plusWeight`]="{ item }">
           <v-text-field
@@ -36,7 +36,6 @@
             hide-details
             reverse
             type="number"
-            @input="updateFormData"
           ></v-text-field>
         </template>
         <template v-slot:[`item.minusWeight`]="{ item }">
@@ -88,13 +87,14 @@
           <v-icon
             color="error"
             small
-            :disabled="exercise.dataOfSet.length == 1"
+            :disabled="dataOfSet.length == 1"
             @click="deleteSet(item)"
           >
             mdi-delete
           </v-icon>
         </template>
       </v-data-table>
+      <div>{{ exercise }}</div>
       <v-btn class="mt-3" block outlined small @click="addNewSet">
         세트 추가
       </v-btn>
@@ -104,65 +104,69 @@
 
 <script>
 export default {
-  props: ["index", "cKey"],
-  computed: {
-    exercise() {
-      return this.$store.state.exercises[this.index];
-      // get() {
-      // return this.$store.state.exercises[this.index];
-      // },
-      // set(value) {
-      //   this.$store.dispatch("setDataOfSet", value, this.index);
-      // },
-    },
-    dataOfSet() {
-      // get() {
-      //   return this.$store.state.exercises[this.index].dataOfSet;
-      // },
-      // set(refreshData) {
-      //   this.$store.dispatch("setDataOfSet", { refreshData, key: this.index });
-      // },
-      return this.$store.state.exercises[this.index].dataOfSet;
+  props: {
+    exercise: {
+      type: Object,
+      default: () => ({}),
     },
   },
   mounted() {
     // 여기에서 userUuid, exerciseUuid를 들고 database에서 history를 뒤져서 가져와야할 듯
+    console.log("mounted");
     this.initDataOfSet();
     this.initHeader();
   },
   watch: {
-    cKey() {
-      this.initHeader();
+    exercise: {
+      deep: true,
+      handler() {
+        console.log("child - exercise - changed");
+        this.initHeader();
+      },
+    },
+    form: {
+      deep: true,
+      handler() {
+        this.$refs.form.resetValidation();
+      },
     },
     dataOfSet: {
       deep: true,
       handler() {
-        console.log("watch!");
+        console.log("watch update");
+        this.dataOfSet.forEach((newSet) => {
+          for (const item in newSet) {
+            if (newSet[item] === "") newSet[item] = 0;
+          }
+        });
+        this.$emit("updateExerciseSet", this.dataOfSet);
+        this.$forceUpdate();
       },
     },
   },
   data() {
     return {
+      dataOfSet: [],
       exerciseType: [],
       headers: [],
     };
   },
   methods: {
     initDataOfSet() {
-      const refreshData = [
-        {
-          prev: 0,
-          plusWeight: 0,
-          minusWeight: 0,
-          lap: 0,
-          timeMin: 0,
-          timeSec: 0,
-        },
-      ];
-      this.$store.dispatch("setDataOfSet", { refreshData, key: this.index });
+      console.log("init Data");
+      this.dataOfSet.push({
+        prev: 0,
+        plusWeight: 0,
+        minusWeight: 0,
+        lap: 0,
+        timeMin: 0,
+        timeSec: 0,
+      });
     },
     checkExerciseCategory() {
+      console.log("child - init - exerciseType");
       this.exerciseType.length = 0;
+      console.log(this.exerciseType);
       switch (this.exercise.category) {
         case "바벨":
         case "덤벨":
@@ -192,6 +196,7 @@ export default {
       }
     },
     initHeader() {
+      console.log("child - init - header");
       this.headers = [
         {
           text: "Set",
@@ -212,7 +217,10 @@ export default {
           sortable: false,
         },
       ];
+      console.log(this.Headers);
+
       this.checkExerciseCategory();
+
       this.exerciseType.forEach((type) => {
         this.headers.splice(this.headers.length - 1, 0, {
           text: this.replacText(type),
@@ -232,30 +240,21 @@ export default {
       }
     },
     addNewSet() {
-      const lastOfDataOfSet =
-        this.$store.state.exercises[this.index].dataOfSet.length - 1;
-      const refreshData = JSON.parse(
-        JSON.stringify(this.$store.state.exercises[this.index].dataOfSet)
-      );
-      const newSet = Object.assign(
-        {},
-        this.$store.state.exercises[this.index].dataOfSet[lastOfDataOfSet]
-      );
-      refreshData.push(newSet);
-      this.$store.dispatch("setDataOfSet", { refreshData, key: this.index });
-      this.$forceUpdate();
+      const lengthOfDataOfSet = this.dataOfSet.length;
+      const newSet = Object.assign({}, this.dataOfSet[lengthOfDataOfSet - 1]);
+      this.dataOfSet.push(newSet);
     },
     deleteSet(item) {
-      if (this.exercise.dataOfSet.length == 1) return;
-      const deleteIndex = this.exercise.dataOfSet.indexOf(item);
-      this.exercise.dataOfSet.splice(this.deleteIndex, 1);
+      if (this.dataOfSet.length == 1) return;
+      const deleteIndex = this.dataOfSet.indexOf(item);
+      this.dataOfSet.splice(this.deleteIndex, 1);
     },
-    updateFormData($event) {
-      console.log("watchData", $event);
-      // 모든 text-field의 input 이벤트들을 여기로 걸어서,
-      // 여기서 값을 확인하고 이 한 object 단위를 싹 업데이트하는게 나을듯
-      // 그러러면 index를 여러방면으로 알아봐야겠다.
-    },
+
+    // deleteItem(item) {
+    //   this.editedItem = Object.assign({}, item);
+    //     this.initData("delete");
+    //   }
+    // },
   },
 };
 </script>
