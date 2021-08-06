@@ -18,9 +18,9 @@
     <v-card-subtitle class="pb-0 px-2">
       <div>총 {{ totalCountOfExercise }} 운동 · {{ totalCountOfSet }} 세트</div>
     </v-card-subtitle>
-    <v-card-actions>
+    <v-card-actions class="pb-0">
       <v-spacer></v-spacer>
-      <v-btn color="blue darken-1" text x-large @click="workout">
+      <v-btn color="blue darken-1" text x-large @click="workoutStart">
         <span class="mr-2">START</span>
         <v-icon>mdi-arrow-right-circle-outline </v-icon>
       </v-btn>
@@ -48,8 +48,10 @@ export default {
     },
   },
   methods: {
-    workout() {
+    workoutStart() {
       console.log("workout!!!");
+      this.$store.dispatch("createWorkoutBottomSheet", "record");
+      this.$store.dispatch("showWorkoutBottomSheet");
     },
   },
 };

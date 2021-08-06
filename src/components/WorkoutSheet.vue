@@ -18,7 +18,6 @@
       persistent
       fullscreen
       hide-overlay
-      class="here"
     >
       <!-- style="z-index: 1" -->
       <!-- :fullscreen="isFullsreen" -->

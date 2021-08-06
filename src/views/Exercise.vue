@@ -1,8 +1,8 @@
 <template>
   <v-container class="pt-0 px-0 pb-14">
+    <!-- :class="{ 'pt-3': isSelectMode }" -->
     <v-data-table
       class="exercise-data-table"
-      :class="{ 'pt-3': isSelectMode }"
       v-model="selectedExercises"
       :show-select="showSelect"
       item-key="exerciseUuid"
