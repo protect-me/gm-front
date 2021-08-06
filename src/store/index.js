@@ -7,9 +7,11 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    userId: "admin",
-    userUuid: "60ec2dda-ef8c-11eb-854b-65b767dc1df8",
-    exercises: []
+    userId: "admin", // admin test
+    userUuid: "60ec2dda-ef8c-11eb-854b-65b767dc1df8", // admin test
+    isShowWorkoutBottomSheet: false,
+    isExistWorkoutBottomSheet: false,
+    workoutBottomSheetMode: 'create', // create | record
   },
   mutations: { // commit
     updateState(state, payload) {
@@ -20,7 +22,20 @@ export default new Vuex.Store({
     resetUserInfo(state) {
       state.userId = ""
       state.userUuid = ""
-    }
+    },
+    showWorkoutBottomSheet(state) {
+      state.isShowWorkoutBottomSheet = true
+    },
+    hideWorkoutBottomSheet(state) {
+      state.isShowWorkoutBottomSheet = false
+    },
+    createWorkoutBottomSheet(state, payload) {
+      state.isExistWorkoutBottomSheet = true
+      state.workoutBottomSheetMode = payload // create | record
+    },
+    removeWorkoutBottomSheet(state) {
+      state.isExistWorkoutBottomSheet = false
+    },
   },
   actions: { // dispatch
     setUserInfo({ commit }, payload) {
@@ -31,7 +46,19 @@ export default new Vuex.Store({
     },
     resetUserInfo({ commit }) {
       commit('resetUserInfo')
-    }
+    },
+    showWorkoutBottomSheet({ commit }) {
+      commit('showWorkoutBottomSheet')
+    },
+    hideWorkoutBottomSheet({ commit }) {
+      commit('hideWorkoutBottomSheet')
+    },
+    createWorkoutBottomSheet({ commit }, payload) {
+      commit('createWorkoutBottomSheet', payload)
+    },
+    removeWorkoutBottomSheet({ commit }) {
+      commit('removeWorkoutBottomSheet')
+    },
   },
   modules: {
     toast

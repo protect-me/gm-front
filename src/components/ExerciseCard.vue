@@ -1,7 +1,7 @@
 <template>
   <v-card class="elevation-1">
     <v-card-title class="pb-0 subtitle-1 font-weight-bold">
-      <v-chip class="mr-2" color="primary" outlined small>
+      <v-chip class="mr-2 grab-area" color="primary" outlined small>
         {{ exercise.target }} | {{ exercise.category }}
       </v-chip>
       <v-spacer></v-spacer>
@@ -10,13 +10,18 @@
       </v-btn>
     </v-card-title>
     <v-card-title class="py-0 subtitle-1 font-weight-bold">
-      {{ exercise.name }}
+      <span class="grab-area">
+        {{ exercise.name }}
+      </span>
     </v-card-title>
     <v-card-text>
       <v-card-subtitle align="left" class="pa-0" v-if="exercise.note">
-        {{ exercise.note }}
+        <span class="grab-area">
+          {{ exercise.note }}
+        </span>
       </v-card-subtitle>
       <v-data-table
+        v-show="tableVisiblity"
         :cKey="cKey"
         class="exercise-block-data-table"
         :headers="headers"
@@ -100,7 +105,14 @@
           </v-icon>
         </template>
       </v-data-table>
-      <v-btn class="mt-3" block outlined small @click="addNewSet">
+      <v-btn
+        v-show="tableVisiblity"
+        class="mt-3"
+        block
+        outlined
+        small
+        @click="addNewSet"
+      >
         세트 추가
       </v-btn>
     </v-card-text>
@@ -118,6 +130,10 @@ export default {
       type: Number,
       default: 0,
     },
+    tableVisiblity: {
+      type: Boolean,
+      default: true,
+    },
   },
   mounted() {
     // 여기에서 userUuid, exerciseUuid를 들고 database에서 history를 뒤져서 가져와야할 듯
@@ -125,16 +141,10 @@ export default {
     this.initHeader();
   },
   watch: {
-    cKey() {
-      console.log("watch ckey updated");
-      this.$forceUpdate;
-    },
     exercise: {
       deep: true,
       handler() {
-        console.log("watch datas => update parent");
         this.initHeader();
-        this.$forceUpdate();
       },
     },
   },
@@ -155,6 +165,7 @@ export default {
         timeMin: 0,
         timeSec: 0,
       });
+      this.emitData();
     },
     checkExerciseCategory() {
       this.exerciseType.length = 0;
@@ -212,14 +223,14 @@ export default {
 
       this.exerciseType.forEach((type) => {
         this.headers.splice(this.headers.length - 1, 0, {
-          text: this.replacText(type),
+          text: this.replaceText(type),
           align: "center",
           value: type,
           sortable: false,
         });
       });
     },
-    replacText(type) {
+    replaceText(type) {
       if (type == "plusWeight") {
         return "+kg";
       } else if (type == "minusWeight") {
@@ -237,7 +248,6 @@ export default {
       this.exercise.dataOfSet.push(newSet);
       const refresh = JSON.parse(JSON.stringify(this.exercise.dataOfSet));
       this.$emit("updateExerciseSet", refresh);
-      this.$forceUpdate;
     },
     deleteSet(item) {
       if (this.exercise.dataOfSet.length == 1) return;

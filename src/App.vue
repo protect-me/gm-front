@@ -3,10 +3,9 @@
     <v-app-bar color="white" app flat>
       <div class="title">💪🏻💪🏼💪🏽💪🏾💪🏿</div>
       <v-spacer></v-spacer>
-      <WorkoutSheet
-        @fullscreen="BottomNavToMiddle"
-        @halfscreen="BottomNavToTop"
-      ></WorkoutSheet>
+      <WorkoutSheet></WorkoutSheet>
+      <!-- @fullscreen="BottomNavToMiddle"
+        @halfscreen="BottomNavToTop" -->
     </v-app-bar>
 
     <v-main>
@@ -15,12 +14,8 @@
       </v-container>
     </v-main>
 
-    <v-bottom-navigation
-      :value="value"
-      color="primary"
-      fixed
-      :style="bottomNavStyle"
-    >
+    <v-bottom-navigation :value="value" color="primary" fixed>
+      <!-- :style="bottomNavStyle" -->
       <v-btn v-for="item in nav" :key="item.title" :to="item.to">
         <v-icon>{{ item.icon }}</v-icon>
       </v-btn>
@@ -60,18 +55,18 @@ export default {
           to: "/exercise",
         },
       ],
-      bottomNavStyle: {
-        zIndex: "6",
-      },
+      // bottomNavStyle: {
+      //   zIndex: "6",
+      // },
     };
   },
   methods: {
-    BottomNavToMiddle() {
-      this.bottomNavStyle.zIndex = "6";
-    },
-    BottomNavToTop() {
-      this.bottomNavStyle.zIndex = "300 !important";
-    },
+    // BottomNavToMiddle() {
+    //   this.bottomNavStyle.zIndex = "6";
+    // },
+    // BottomNavToTop() {
+    //   this.bottomNavStyle.zIndex = "300 !important";
+    // },
   },
 };
 </script>
