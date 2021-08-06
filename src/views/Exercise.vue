@@ -282,7 +282,7 @@ export default {
 
   created() {
     this.addAdminAction();
-    this.initialize();
+    this.loadExerciseData();
     if (this.mode == "select") {
       this.showSelect = true;
     }
@@ -298,10 +298,25 @@ export default {
         });
       }
     },
-    initialize() {
-      this.$http.get("/api/exercise").then((res) => {
-        this.exercises = res.data;
-      });
+    async loadExerciseData() {
+      try {
+        const res = await this.$http.get("/api/exercise");
+        if (res.data.success == true) {
+          this.exercises = res.data.rows;
+        } else {
+          this.$store.dispatch("popToast", {
+            msg: `데이터를 가져오는데 실패했습니다.(401) ${res.data.message}`,
+            color: "error",
+          });
+          console.log(res.data.message);
+        }
+      } catch (err) {
+        this.$store.dispatch("popToast", {
+          msg: `데이터를 가져오는데 실패했습니다.(500) ${err}`,
+          color: "error",
+        });
+        console.log(err);
+      }
     },
 
     // 등록 및 수정
@@ -341,7 +356,7 @@ export default {
         } else {
           // alert(res.data.message); // 실패
           this.$store.dispatch("popToast", {
-            msg: `Regist Failed(500) ${err}`,
+            msg: `Regist Failed(401) ${err}`,
             color: "error",
           });
         }

@@ -30,8 +30,8 @@
             <v-spacer></v-spacer>
 
             <v-text-field
-              label="Routine name"
-              v-model="form.name"
+              label="Routine Name"
+              v-model="routineGroupName"
               hide-details
               required
             ></v-text-field>
@@ -74,14 +74,14 @@
               @start="tableVisiblity = false"
               @end="tableVisiblity = true"
             >
-              <ExerciseBlock
+              <ExerciseCard
                 v-for="(exercise, exerciseIndex) in exercises"
                 :key="exerciseIndex"
                 :exercise="exercise"
                 :cKey="cKey"
                 :tableVisiblity="tableVisiblity"
                 @updateExerciseSet="updateExerciseSet($event, exerciseIndex)"
-              ></ExerciseBlock>
+              ></ExerciseCard>
             </draggable>
             <div style="display: flex; flex-direction: column">
               <v-dialog v-model="exerciseDialog" fullscreen persistant>
@@ -125,16 +125,16 @@
 </template>
 
 <script>
-import StopWatch from "@/utils/StopWatch";
 import Exercise from "@/views/Exercise";
-import ExerciseBlock from "@/components/ExerciseBlock";
+import ExerciseCard from "@/components/ExerciseCard";
+import StopWatch from "@/utils/StopWatch";
 import draggable from "vuedraggable";
 
 export default {
   components: {
     StopWatch,
     Exercise,
-    ExerciseBlock,
+    ExerciseCard,
     draggable,
   },
   watch: {
@@ -171,9 +171,7 @@ export default {
       editIndex: -1,
       sheet: false,
       isFullsreen: true,
-      form: {
-        name: "New Routine",
-      },
+      routineGroupName: "New Routine",
     };
   },
   methods: {
@@ -218,6 +216,7 @@ export default {
     },
     savePreProcessing() {
       const userUuid = this.$store.state.userUuid;
+      const routineGroupName = this.routineGroupName;
       let countOfExercise = 0;
       this.exercises.forEach((exercise) => {
         ++countOfExercise;
@@ -226,6 +225,7 @@ export default {
         for (const item in dataOfSet) {
           const newLine = [];
           newLine.push(
+            routineGroupName,
             userUuid,
             exercise.exerciseUuid,
             countOfExercise,
