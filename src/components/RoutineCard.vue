@@ -1,6 +1,9 @@
 <template>
   <v-card>
-    <v-card-title style="display: flex; width: 100%; flex-wrap: nowrap">
+    <v-card-title
+      class="pt-2 px-2"
+      style="display: flex; width: 100%; flex-wrap: nowrap"
+    >
       <div
         class="mr-2"
         style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
@@ -12,7 +15,7 @@
         <v-icon> mdi-dots-horizontal </v-icon>
       </v-btn>
     </v-card-title>
-    <v-card-subtitle class="pb-0">
+    <v-card-subtitle class="pb-0 px-2">
       <div>총 {{ totalCountOfExercise }} 운동 · {{ totalCountOfSet }} 세트</div>
     </v-card-subtitle>
     <v-card-actions>
@@ -42,6 +45,11 @@ export default {
     },
     totalCountOfSet() {
       return this.routineGroup.dataOfSet.length;
+    },
+  },
+  methods: {
+    workout() {
+      console.log("workout!!!");
     },
   },
 };

@@ -1,156 +1,158 @@
 <template>
-  <v-data-table
-    class="exercise-data-table"
-    :class="{ 'pt-3': isSelectMode }"
-    v-model="selectedExercises"
-    :show-select="showSelect"
-    item-key="exerciseUuid"
-    :headers="headers"
-    :items="exercisesDisplay"
-    :search="search"
-    sort-by="target"
-    hide-default-footer
-    mobile-breakpoint="1"
-    disable-pagination
-  >
-    <!-- :loading="loading"
+  <v-container class="pt-0 px-0 pb-14">
+    <v-data-table
+      class="exercise-data-table"
+      :class="{ 'pt-3': isSelectMode }"
+      v-model="selectedExercises"
+      :show-select="showSelect"
+      item-key="exerciseUuid"
+      :headers="headers"
+      :items="exercisesDisplay"
+      :search="search"
+      sort-by="target"
+      hide-default-footer
+      mobile-breakpoint="1"
+      disable-pagination
+    >
+      <!-- :loading="loading"
     :loading-text="loadingText" -->
-    <template v-slot:top>
-      <!-- 상단 : 검색 / NEW -->
-      <v-toolbar flat class>
-        <v-btn
-          v-if="mode == 'select'"
-          text
+      <template v-slot:top>
+        <!-- 상단 : 검색 / NEW -->
+        <v-toolbar flat class>
+          <v-btn
+            v-if="mode == 'select'"
+            text
+            color="error"
+            class="pa-0"
+            min-width="40px"
+            @click="$emit('closeExerciseDialog')"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+
+          <v-spacer v-if="mode == 'select'"></v-spacer>
+          <v-divider
+            v-if="mode == 'select'"
+            class="mx-3"
+            inset
+            vertical
+          ></v-divider>
+          <v-spacer v-if="mode == 'select'"></v-spacer>
+
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Search"
+            single-line
+            hide-details
+          ></v-text-field>
+
+          <v-spacer></v-spacer>
+          <v-divider class="mx-3" inset vertical></v-divider>
+          <v-spacer></v-spacer>
+
+          <v-dialog
+            v-if="mode == 'view'"
+            v-model="dialog"
+            max-width="500px"
+            persistant
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
+                New
+              </v-btn>
+            </template>
+            <ExerciseForm
+              :form="editedItem"
+              :formMode="formMode"
+              @initData="initData"
+              @closeDialog="closeDialog"
+              @editProcessFinished="editUserScreenData"
+            ></ExerciseForm>
+          </v-dialog>
+
+          <v-btn
+            v-if="mode == 'select'"
+            color="primary"
+            @click="$emit('selectExerciseComplete', selectedExercises)"
+          >
+            선택완료({{ selectedExercises.length }})
+          </v-btn>
+
+          <v-dialog v-model="dialogDelete" max-width="500px" persistent>
+            <v-card>
+              <v-card-title class="text-h6">
+                복구가 불가능합니다. <br />그래도 삭제하시겠습니까?
+              </v-card-title>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="closeDeleteDialog">
+                  Cancel
+                </v-btn>
+                <v-btn color="blue darken-1" text @click="deleteItemConfirm">
+                  OK
+                </v-btn>
+                <v-spacer></v-spacer>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-toolbar>
+
+        <!-- 상단 : 카테고리 / 타겟-->
+        <v-toolbar flat class="mb-2">
+          <v-select
+            :items="categories"
+            v-model="selectedCategory"
+            outlined
+            dense
+            hide-details
+            label="Category"
+          ></v-select>
+          <v-spacer></v-spacer>
+          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-spacer></v-spacer>
+          <v-select
+            :items="targets"
+            v-model="selectedTarget"
+            outlined
+            hide-details
+            dense
+            label="Targets"
+          ></v-select>
+        </v-toolbar>
+      </template>
+
+      <template v-slot:[`item.name`]="{ item }">
+        <div>
+          {{ item.name }}
+        </div>
+        <div style="color: gray">
+          {{ item.note }}
+        </div>
+      </template>
+      <template v-slot:[`item.actions`]="{ item }">
+        <v-icon
+          :disabled="item.defualt"
+          small
+          class="mr-2"
+          @click="editItem(item)"
           color="error"
-          class="pa-0"
-          min-width="40px"
-          @click="$emit('closeExerciseDialog')"
         >
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-
-        <v-spacer v-if="mode == 'select'"></v-spacer>
-        <v-divider
-          v-if="mode == 'select'"
-          class="mx-3"
-          inset
-          vertical
-        ></v-divider>
-        <v-spacer v-if="mode == 'select'"></v-spacer>
-
-        <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Search"
-          single-line
-          hide-details
-        ></v-text-field>
-
-        <v-spacer></v-spacer>
-        <v-divider class="mx-3" inset vertical></v-divider>
-        <v-spacer></v-spacer>
-
-        <v-dialog
-          v-if="mode == 'view'"
-          v-model="dialog"
-          max-width="500px"
-          persistant
+          mdi-pencil
+        </v-icon>
+        <v-icon
+          :disabled="item.defualt"
+          color="error"
+          small
+          @click="deleteItem(item)"
         >
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
-              New
-            </v-btn>
-          </template>
-          <ExerciseForm
-            :form="editedItem"
-            :formMode="formMode"
-            @initData="initData"
-            @closeDialog="closeDialog"
-            @editProcessFinished="editUserScreenData"
-          ></ExerciseForm>
-        </v-dialog>
+          mdi-delete
+        </v-icon>
+      </template>
 
-        <v-btn
-          v-if="mode == 'select'"
-          color="primary"
-          @click="$emit('selectExerciseComplete', selectedExercises)"
-        >
-          선택완료({{ selectedExercises.length }})
-        </v-btn>
-
-        <v-dialog v-model="dialogDelete" max-width="500px" persistent>
-          <v-card>
-            <v-card-title class="text-h6">
-              복구가 불가능합니다. <br />그래도 삭제하시겠습니까?
-            </v-card-title>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeDeleteDialog">
-                Cancel
-              </v-btn>
-              <v-btn color="blue darken-1" text @click="deleteItemConfirm">
-                OK
-              </v-btn>
-              <v-spacer></v-spacer>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </v-toolbar>
-
-      <!-- 상단 : 카테고리 / 타겟-->
-      <v-toolbar flat class="mb-2">
-        <v-select
-          :items="categories"
-          v-model="selectedCategory"
-          outlined
-          dense
-          hide-details
-          label="Category"
-        ></v-select>
-        <v-spacer></v-spacer>
-        <v-divider class="mx-4" inset vertical></v-divider>
-        <v-spacer></v-spacer>
-        <v-select
-          :items="targets"
-          v-model="selectedTarget"
-          outlined
-          hide-details
-          dense
-          label="Targets"
-        ></v-select>
-      </v-toolbar>
-    </template>
-
-    <template v-slot:[`item.name`]="{ item }">
-      <div>
-        {{ item.name }}
-      </div>
-      <div style="color: gray">
-        {{ item.note }}
-      </div>
-    </template>
-    <template v-slot:[`item.actions`]="{ item }">
-      <v-icon
-        :disabled="item.defualt"
-        small
-        class="mr-2"
-        @click="editItem(item)"
-        color="error"
-      >
-        mdi-pencil
-      </v-icon>
-      <v-icon
-        :disabled="item.defualt"
-        color="error"
-        small
-        @click="deleteItem(item)"
-      >
-        mdi-delete
-      </v-icon>
-    </template>
-
-    <template v-slot:no-data> 데이터가 없습니다 🧙🏻‍♂️ </template>
-  </v-data-table>
+      <template v-slot:no-data> 데이터가 없습니다 🧙🏻‍♂️ </template>
+    </v-data-table>
+  </v-container>
 </template>
 
 <script>

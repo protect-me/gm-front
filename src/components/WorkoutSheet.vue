@@ -1,20 +1,31 @@
 <template>
   <div class="text-center">
-    <v-btn color="primary" dark @click="openBottomSheet"> Workout </v-btn>
+    <v-btn
+      color="primary"
+      @click="openBottomSheet"
+      :disabled="
+        !$store.state.isExistWorkoutBottomSheet ||
+        $store.state.workoutBottomSheetMode == 'create'
+      "
+    >
+      Workout
+    </v-btn>
 
     <v-bottom-sheet
-      v-if="existence"
-      v-model="sheet"
-      :fullscreen="isFullsreen"
+      v-if="$store.state.isExistWorkoutBottomSheet"
+      v-model="$store.state.isShowWorkoutBottomSheet"
       scrollable
       persistent
+      fullscreen
       hide-overlay
       class="here"
-      style="z-index: 1"
     >
-      <v-sheet class="text-center" :height="bottomSheetHeight">
+      <!-- style="z-index: 1" -->
+      <!-- :fullscreen="isFullsreen" -->
+      <v-sheet class="text-center">
+        <!-- <v-sheet class="text-center" :height="bottomSheetHeight"> -->
         <v-card>
-          <v-card-title v-if="mode == 'create'">
+          <v-card-title v-if="$store.state.workoutBottomSheetMode == 'create'">
             <v-btn
               text
               color="error"
@@ -49,20 +60,29 @@
             </v-btn>
           </v-card-title>
 
-          <v-card-title v-if="mode == 'record'">
+          <v-card-title v-if="$store.state.workoutBottomSheetMode == 'record'">
             <span>Routine Title</span>
 
             <v-spacer></v-spacer>
             <v-divider class="mx-3" inset vertical></v-divider>
             <v-spacer></v-spacer>
 
-            <v-btn @click="fullscreenToggle" outlined small color="secondary">
-              <span v-if="isFullsreen">Minimize 👇🏻</span>
-              <span v-else>Maximize 👆🏻</span>
+            <!-- <v-btn @click="fullscreenToggle" outlined color="secondary"> -->
+            <v-btn
+              @click="$store.dispatch('hideWorkoutBottomSheet')"
+              outlined
+              color="secondary"
+            >
+              HIDE 👇🏻
+              <!-- <span v-if="isFullsreen">Minimize 👇🏻</span>
+              <span v-else>Maximize 👆🏻</span> -->
             </v-btn>
           </v-card-title>
 
-          <v-card-subtitle align="left" v-if="mode == 'record'">
+          <v-card-subtitle
+            align="left"
+            v-if="$store.state.workoutBottomSheetMode == 'record'"
+          >
             <StopWatch></StopWatch>
           </v-card-subtitle>
 
@@ -108,7 +128,7 @@
                 </v-card>
               </v-dialog>
               <v-btn
-                v-if="mode == 'record'"
+                v-if="$store.state.workoutBottomSheetMode == 'record'"
                 class="mt-3"
                 color="error"
                 block
@@ -137,40 +157,34 @@ export default {
     ExerciseCard,
     draggable,
   },
-  watch: {
-    isFullsreen() {
-      if (this.isFullsreen) {
-        this.$emit("fullscreen");
-      } else {
-        this.$emit("halfscreen");
-      }
-    },
-  },
-  computed: {
-    bottomSheetHeight() {
-      if (this.isFullsreen) {
-        return "100vh";
-      } else {
-        return "200px";
-      }
-    },
-  },
+  // watch: {
+  //   isFullsreen() {
+  //     if (this.isFullsreen) {
+  //       this.$emit("fullscreen");
+  //     } else {
+  //       this.$emit("halfscreen");
+  //     }
+  //   },
+  // },
+  // computed: {
+  //   bottomSheetHeight() {
+  //     if (this.isFullsreen) {
+  //       return "100vh";
+  //     } else {
+  //       return "0px";
+  //     }
+  //   },
+  // },
   data() {
     return {
       cKey: 0,
       tableVisiblity: true,
-      mode: "create", // record || create
-      existence: false,
+      // mode: "create", // record || create
       exercises: [],
       newRoutine: [],
-      testRoutine: {
-        name: "hell",
-        age: 30,
-      },
       exerciseDialog: false,
       editIndex: -1,
-      sheet: false,
-      isFullsreen: true,
+      // isFullsreen: true,
       routineGroupName: "New Routine",
     };
   },
@@ -179,27 +193,27 @@ export default {
       this.cKey++;
     },
     openBottomSheet() {
-      this.sheet = true;
-      this.existence = true;
+      this.$store.dispatch("createWorkoutBottomSheet", "record");
+      this.$store.dispatch("showWorkoutBottomSheet");
       this.isFullsreen = true;
     },
     eraseWorkoutSheet() {
       if (this.exercises > 0) {
         if (confirm("데이터가 모두 삭제됩니다. 그래도 닫으시겠어요? 🧙🏻‍♂")) {
-          this.existence = false;
+          this.$store.dispatch("removeWorkoutBottomSheet");
           this.exercises = [];
         }
       } else {
-        this.existence = false;
+        this.$store.dispatch("removeWorkoutBottomSheet");
         this.exercises = [];
       }
     },
     closeBottomSheet() {
-      this.sheet = false;
+      this.$store.dispatch("hideWorkoutBottomSheet");
     },
-    fullscreenToggle() {
-      this.isFullsreen = !this.isFullsreen;
-    },
+    // fullscreenToggle() {
+    //   this.isFullsreen = !this.isFullsreen;
+    // },
     openExerciseDialog() {
       this.exerciseDialog = true;
     },

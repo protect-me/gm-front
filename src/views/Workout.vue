@@ -1,10 +1,19 @@
 <template>
-  <v-container fluid>
-    <v-row dense>
+  <v-container class="pt-0 px-2 pb-14">
+    <v-row class="py-5">
+      <v-btn block color="primary" large @click="makeNewRoutine">
+        Make New Routine
+      </v-btn>
+    </v-row>
+    <v-row>
+      <v-divider class="pb-4"></v-divider>
+    </v-row>
+    <v-row>
       <v-col
+        class="pa-1"
         v-for="routineGroup in groupedRoutines"
         :key="routineGroup.routineGroupUuid"
-        cols="12"
+        cols="6"
       >
         <!-- :cols="card.flex" -->
         <RoutineCard :routineGroup="routineGroup"> </RoutineCard>
@@ -58,12 +67,6 @@ export default {
       }
     },
     groupingRoutines() {
-      // this.groupedRoutines = this.routines.reduce((acc, cur) => {
-      //   let key = cur["routineGroupUuid"];
-      //   if (!acc[key]) acc[key] = [];
-      //   acc[key].push(cur);
-      //   return acc;
-      // }, {});
       let initGroup = {
         routineGroupName: "",
         routineGroupUuid: "",
@@ -91,37 +94,10 @@ export default {
           this.groupedRoutines.push(newGroup);
         }
       });
-
-      console.log(this.groupedRoutines);
-
-      // const newGroup = {
-      //   routineGroupUuid: "",
-      //   countOfExercise: 0,
-      //   countOfSet: 0,
-      // };
-      // routine의 routineGroupUuid
-      // routine의 마지막 index = countOfSet
-      // routine의 마지막 index의 값 = countOfExercise
-
-      // for (let routine in this.routines) {
-      //   this.routines[routine];
-      //   console.log("?", this.routines[routine]);
-      // }
-      // this.routines.forEach((routine, index) => {});
-      //   routine.routineGroupUuid;
-      //   countOf;
-
-      // if (routine.routineUuid[0]) {
-      //   newGroup.routineUuid = routine.routineUuid;
-      //   routineTotalExerciseCount++;
-      //   routineTotalSetCount++;
-      // } else if (routine === routines[index - 1]) {
-      //   routineTotalSetCount++;
-      // } else if (routine !== routines[index - 1]) {
-      //   routineTotalExerciseCount++;
-      //   routineTotalSetCount++;
-      // }
-      // if (routine.routineUuid) this.groupedRoutines;
+    },
+    makeNewRoutine() {
+      this.$store.dispatch("createWorkoutBottomSheet", "create");
+      this.$store.dispatch("showWorkoutBottomSheet");
     },
   },
 };
