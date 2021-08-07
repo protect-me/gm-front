@@ -38,11 +38,6 @@ export default {
   created() {
     this.loadRoutineData();
   },
-  // watch: {
-  //   routines(nv) {
-  //     console.log("watch routines", nv);
-  //   },
-  // },
   methods: {
     async loadRoutineData() {
       const userUuid = this.$store.state.userUuid;
@@ -50,6 +45,7 @@ export default {
         const res = await this.$http.get(`/api/routine/${userUuid}`);
         if (res.data.success == true) {
           this.routines = res.data.rows;
+          console.log(this.routines);
           this.groupingRoutines();
         } else {
           this.$store.dispatch("popToast", {
@@ -70,12 +66,12 @@ export default {
       let initGroup = {
         routineGroupName: "",
         routineGroupUuid: "",
-        dataOfSet: [],
+        exercises: [],
       };
       let newGroup = {
         routineGroupName: "",
         routineGroupUuid: "",
-        dataOfSet: [],
+        exercises: [],
       };
       this.routines.forEach((oneOfSet, index) => {
         if (newGroup.routineGroupUuid !== oneOfSet.routineGroupUuid) {
@@ -85,15 +81,16 @@ export default {
           }
           newGroup.routineGroupName = oneOfSet.routineGroupName;
           newGroup.routineGroupUuid = oneOfSet.routineGroupUuid;
-          newGroup.dataOfSet.push(oneOfSet);
+          newGroup.exercises.push(oneOfSet);
         } else {
-          newGroup.dataOfSet.push(oneOfSet);
+          newGroup.exercises.push(oneOfSet);
         }
 
         if (index === this.routines.length - 1) {
           this.groupedRoutines.push(newGroup);
         }
       });
+      console.log(this.groupedRoutines);
     },
     makeNewRoutine() {
       this.$store.dispatch("createWorkoutBottomSheet", "create");

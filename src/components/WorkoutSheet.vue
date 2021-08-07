@@ -4,27 +4,23 @@
       color="primary"
       @click="openBottomSheet"
       :disabled="
-        !$store.state.isExistWorkoutBottomSheet ||
-        $store.state.workoutBottomSheetMode == 'create'
+        !isExistWorkoutBottomSheet || workoutBottomSheetMode == 'create'
       "
     >
       Workout
     </v-btn>
 
     <v-bottom-sheet
-      v-if="$store.state.isExistWorkoutBottomSheet"
-      v-model="$store.state.isShowWorkoutBottomSheet"
+      v-if="isExistWorkoutBottomSheet"
+      v-model="isShowWorkoutBottomSheet"
       scrollable
       persistent
       fullscreen
       hide-overlay
     >
-      <!-- style="z-index: 1" -->
-      <!-- :fullscreen="isFullsreen" -->
       <v-sheet class="text-center">
-        <!-- <v-sheet class="text-center" :height="bottomSheetHeight"> -->
         <v-card>
-          <v-card-title v-if="$store.state.workoutBottomSheetMode == 'create'">
+          <v-card-title v-if="workoutBottomSheetMode == 'create'">
             <v-btn
               text
               color="error"
@@ -59,28 +55,25 @@
             </v-btn>
           </v-card-title>
 
-          <v-card-title v-if="$store.state.workoutBottomSheetMode == 'record'">
+          <v-card-title v-if="workoutBottomSheetMode == 'record'">
             <span>Routine Title</span>
 
             <v-spacer></v-spacer>
             <v-divider class="mx-3" inset vertical></v-divider>
             <v-spacer></v-spacer>
 
-            <!-- <v-btn @click="fullscreenToggle" outlined color="secondary"> -->
             <v-btn
               @click="$store.dispatch('hideWorkoutBottomSheet')"
               outlined
               color="secondary"
             >
               HIDE 👇🏻
-              <!-- <span v-if="isFullsreen">Minimize 👇🏻</span>
-              <span v-else>Maximize 👆🏻</span> -->
             </v-btn>
           </v-card-title>
 
           <v-card-subtitle
             align="left"
-            v-if="$store.state.workoutBottomSheetMode == 'record'"
+            v-if="workoutBottomSheetMode == 'record'"
           >
             <StopWatch></StopWatch>
           </v-card-subtitle>
@@ -127,7 +120,7 @@
                 </v-card>
               </v-dialog>
               <v-btn
-                v-if="$store.state.workoutBottomSheetMode == 'record'"
+                v-if="workoutBottomSheetMode == 'record'"
                 class="mt-3"
                 color="error"
                 block
@@ -148,6 +141,7 @@ import Exercise from "@/views/Exercise";
 import ExerciseCard from "@/components/ExerciseCard";
 import StopWatch from "@/utils/StopWatch";
 import draggable from "vuedraggable";
+import { mapState } from "vuex";
 
 export default {
   components: {
@@ -156,38 +150,40 @@ export default {
     ExerciseCard,
     draggable,
   },
-  // watch: {
-  //   isFullsreen() {
-  //     if (this.isFullsreen) {
-  //       this.$emit("fullscreen");
-  //     } else {
-  //       this.$emit("halfscreen");
-  //     }
-  //   },
-  // },
-  // computed: {
-  //   bottomSheetHeight() {
-  //     if (this.isFullsreen) {
-  //       return "100vh";
-  //     } else {
-  //       return "0px";
-  //     }
-  //   },
-  // },
+  computed: {
+    ...mapState(["isShowWorkoutBottomSheet", "isExistWorkoutBottomSheet"]),
+    workoutBottomSheetMode: {
+      get() {
+        this.initExercises();
+        return this.$store.state.workoutBottomSheetMode;
+      },
+    },
+  },
+  mounted() {
+    this.initExercises(); // record mode
+  },
   data() {
     return {
       cKey: 0,
       tableVisiblity: true,
-      // mode: "create", // record || create
       exercises: [],
       newRoutine: [],
       exerciseDialog: false,
       editIndex: -1,
-      // isFullsreen: true,
       routineGroupName: "New Routine",
     };
   },
   methods: {
+    initExercises() {
+      console.log("init!!!!!!!!!");
+      if (this.$store.state.workoutBottomSheetMode == "record") {
+        console.log("record!!!!!");
+        // this.exercises = this.$store.state.exercises;
+        // console.log("init Data", this.$store.state.routineGroup);
+      } else {
+        console.log("create!!!!!");
+      }
+    },
     updateCKey() {
       this.cKey++;
     },
@@ -210,9 +206,6 @@ export default {
     closeBottomSheet() {
       this.$store.dispatch("hideWorkoutBottomSheet");
     },
-    // fullscreenToggle() {
-    //   this.isFullsreen = !this.isFullsreen;
-    // },
     openExerciseDialog() {
       this.exerciseDialog = true;
     },
@@ -260,9 +253,6 @@ export default {
     },
     async save() {
       try {
-        // Test Get
-        // const userUuid = this.$store.state.userUuid;
-        // const res = await this.$http.get(`/api/routine/${userUuid}`);
         const newRoutine = this.newRoutine;
         const res = await this.$http.post(`/api/routine/regist`, {
           newRoutine,

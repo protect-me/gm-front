@@ -20,7 +20,13 @@
     </v-card-subtitle>
     <v-card-actions class="pb-0">
       <v-spacer></v-spacer>
-      <v-btn color="blue darken-1" text x-large @click="workoutStart">
+      <v-btn
+        color="blue darken-1"
+        text
+        x-large
+        @click="workoutStart"
+        :disabled="$store.state.isExistWorkoutBottomSheet"
+      >
         <span class="mr-2">START</span>
         <v-icon>mdi-arrow-right-circle-outline </v-icon>
       </v-btn>
@@ -40,11 +46,11 @@ export default {
   },
   computed: {
     totalCountOfExercise() {
-      const lastIndex = this.routineGroup.dataOfSet.length - 1;
-      return this.routineGroup.dataOfSet[lastIndex].countOfExercise;
+      const lastIndex = this.routineGroup.exercises.length - 1;
+      return this.routineGroup.exercises[lastIndex].countOfExercise;
     },
     totalCountOfSet() {
-      return this.routineGroup.dataOfSet.length;
+      return this.routineGroup.exercises.length;
     },
   },
   methods: {
@@ -52,6 +58,7 @@ export default {
       console.log("workout!!!");
       this.$store.dispatch("createWorkoutBottomSheet", "record");
       this.$store.dispatch("showWorkoutBottomSheet");
+      this.$store.dispatch("setRoutine", this.routineGroup);
     },
   },
 };
