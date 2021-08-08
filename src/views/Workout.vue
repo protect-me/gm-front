@@ -8,6 +8,17 @@
     <v-row>
       <v-divider class="pb-4"></v-divider>
     </v-row>
+    <v-row
+      v-if="$store.state.isExistWorkoutBottomSheet"
+      class="mb-4"
+      style="border-radius: 5px; background-color: #e0e0e0"
+      justify="center"
+    >
+      <div class="pa-3 font-weight-bold" align="center">
+        진행중인 워크아웃이 있을 경우, <br />
+        새 워크아웃을 시작할 수 없습니다 🧙🏻‍♂️
+      </div>
+    </v-row>
     <v-row>
       <v-col
         class="pa-1"
@@ -75,7 +86,12 @@ export default {
       };
       this.routines.forEach((oneOfSet, index) => {
         if (newGroup.routineGroupUuid !== oneOfSet.routineGroupUuid) {
+          // newGroup의 uuid와 roof의 uuid가 다를 경우
           if (newGroup.routineGroupUuid !== "") {
+            // newGroup의 uuid가 있을 경우
+            // => 기존에 만든 newGroup을 groupedRoutines에 push
+            // => newGroup을 init(clone)
+            // newGroup의 uuid가 없을 경우는 index가 0인 경우와 같으므로 init을 할 필요가 없음
             this.groupedRoutines.push(newGroup);
             newGroup = Object.assign({}, initGroup);
           }
@@ -83,6 +99,7 @@ export default {
           newGroup.routineGroupUuid = oneOfSet.routineGroupUuid;
           newGroup.exercises.push(oneOfSet);
         } else {
+          // newGroup의 uuid와 roof의 uuid가 같은 경우 => newGroup에 push
           newGroup.exercises.push(oneOfSet);
         }
 

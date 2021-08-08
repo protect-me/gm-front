@@ -7,7 +7,7 @@
         !isExistWorkoutBottomSheet || workoutBottomSheetMode == 'create'
       "
     >
-      Workout
+      WORKOUT 👆🏻
     </v-btn>
 
     <v-bottom-sheet
@@ -55,12 +55,26 @@
             </v-btn>
           </v-card-title>
 
-          <v-card-title v-if="workoutBottomSheetMode == 'record'">
-            <span>Routine Title</span>
+          <v-card-title
+            v-if="workoutBottomSheetMode == 'record'"
+            style="display: flex; width: 100%; flex-wrap: nowrap"
+          >
+            <div
+              class="mr-2"
+              style="
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              "
+            >
+              {{ routineGroupName }}
+            </div>
 
             <v-spacer></v-spacer>
-            <v-divider class="mx-3" inset vertical></v-divider>
-            <v-spacer></v-spacer>
+            <span v-if="workoutBottomSheetMode == 'record'">
+              <v-divider class="mx-3" inset vertical></v-divider>
+              <v-spacer></v-spacer>
+            </span>
 
             <v-btn
               @click="$store.dispatch('hideWorkoutBottomSheet')"
@@ -125,6 +139,7 @@
                 color="error"
                 block
                 outlined
+                @click="savePreProcessing"
               >
                 운동 종료
               </v-btn>
@@ -154,13 +169,13 @@ export default {
     ...mapState(["isShowWorkoutBottomSheet", "isExistWorkoutBottomSheet"]),
     workoutBottomSheetMode: {
       get() {
-        this.initExercises();
+        this.initData();
         return this.$store.state.workoutBottomSheetMode;
       },
     },
   },
   mounted() {
-    this.initExercises(); // record mode
+    this.initData(); // record mode
   },
   data() {
     return {
@@ -171,18 +186,82 @@ export default {
       exerciseDialog: false,
       editIndex: -1,
       routineGroupName: "New Routine",
+      routineGroupUuid: "", // record mode
+      startTime: "",
     };
   },
   methods: {
-    initExercises() {
-      console.log("init!!!!!!!!!");
+    initData() {
+      if (this.exercises.length > 0) return; // 이미 exercises가 있을 경우 return
       if (this.$store.state.workoutBottomSheetMode == "record") {
-        console.log("record!!!!!");
-        // this.exercises = this.$store.state.exercises;
-        // console.log("init Data", this.$store.state.routineGroup);
-      } else {
-        console.log("create!!!!!");
+        this.routineGroupName = this.$store.state.routineGroup.routineGroupName;
+        this.routineGroupUuid = this.$store.state.routineGroup.routineGroupUuid;
+        this.initExercisesData();
+        this.setStartTime();
       }
+    },
+    initExercisesData() {
+      let initExercise = {
+        countOfExercise: 0,
+        exerciseUuid: "",
+        name: "",
+        category: "",
+        target: "",
+        note: "",
+        admin: "",
+        dataOfSet: [],
+      };
+      let newExercise = {
+        countOfExercise: 0,
+        exerciseUuid: "",
+        name: "",
+        category: "",
+        target: "",
+        note: "",
+        admin: "",
+        dataOfSet: [],
+      };
+      this.$store.state.routineGroup.exercises.forEach((oneOfSet, index) => {
+        if (index == 0) {
+          // First Set
+          newExercise.exerciseUuid = oneOfSet.exerciseUuid;
+          newExercise.name = oneOfSet.name;
+          newExercise.category = oneOfSet.category;
+          newExercise.target = oneOfSet.target;
+          newExercise.note = oneOfSet.note;
+          newExercise.admin = oneOfSet.admin;
+          newExercise.dataOfSet.push(oneOfSet);
+          if (this.$store.state.routineGroup.length == 1) {
+            // length가 1일 경우 push
+            this.exercises.push(newExercise); // push
+          }
+        } else {
+          // etc Set
+          if (newExercise.countOfExercise == oneOfSet.countOfExercise) {
+            // 앞의 count와 같을 경우
+            newExercise.dataOfSet.push(oneOfSet);
+          } else {
+            // 앞의 count와 다를 경우 => push && init
+            this.exercises.push(newExercise); // push
+            newExercise = Object.assign({}, initExercise); // init
+            newExercise.exerciseUuid = oneOfSet.exerciseUuid;
+            newExercise.name = oneOfSet.name;
+            newExercise.category = oneOfSet.category;
+            newExercise.target = oneOfSet.target;
+            newExercise.note = oneOfSet.note;
+            newExercise.admin = oneOfSet.admin;
+            newExercise.dataOfSet.push(oneOfSet);
+          }
+        }
+        if (index == this.$store.state.routineGroup.exercises.length - 1) {
+          // Last Set
+          this.exercises.push(newExercise); // push
+        }
+      });
+    },
+    setStartTime() {
+      // this.startTime = new Date().toISOString().slice(0, 19).replace("T", " ");
+      this.startTime = new Date().toISOString().slice(0, 19).replace("T", " ");
     },
     updateCKey() {
       this.cKey++;
@@ -221,6 +300,9 @@ export default {
       this.updateCKey();
     },
     savePreProcessing() {
+      if (this.workoutBottomSheetMode == "record") {
+        if (!confirm("운동을 종료하시겠습니까? 🧙🏻‍♂️")) return;
+      }
       const userUuid = this.$store.state.userUuid;
       const routineGroupName = this.routineGroupName;
       let countOfExercise = 0;
@@ -245,18 +327,28 @@ export default {
           this.newRoutine.push(newLine);
         }
       });
-      // test print
-      this.newRoutine.forEach((item) => {
-        console.log(item);
-      });
       this.save();
+      // test print
+      // this.newRoutine.forEach((item) => {
+      //   console.log(item);
+      // });
     },
     async save() {
       try {
-        const newRoutine = this.newRoutine;
-        const res = await this.$http.post(`/api/routine/regist`, {
-          newRoutine,
-        });
+        const reqData = {};
+        reqData.newRoutine = this.newRoutine;
+        reqData.startTime = this.startTime;
+        reqData.endTime = new Date()
+          .toISOString()
+          .slice(0, 19)
+          .replace("T", " ");
+        let url = ``;
+        if (this.workoutBottomSheetMode == "create") {
+          url = `/api/routine/regist`;
+        } else {
+          url = `/api/records/regist`;
+        }
+        const res = await this.$http.post(url, { reqData });
         if (res.data.success == true) {
           this.$store.dispatch("popToast", {
             msg: res.data.message,
