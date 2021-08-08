@@ -12,6 +12,7 @@ export default new Vuex.Store({
     isShowWorkoutBottomSheet: false,
     isExistWorkoutBottomSheet: false,
     workoutBottomSheetMode: 'create', // create | record
+    routineGroup: {}
   },
   mutations: { // commit
     updateState(state, payload) {
@@ -36,6 +37,9 @@ export default new Vuex.Store({
     removeWorkoutBottomSheet(state) {
       state.isExistWorkoutBottomSheet = false
     },
+    setRoutine(state, payload) {
+      state.routineGroup = payload
+    }
   },
   actions: { // dispatch
     setUserInfo({ commit }, payload) {
@@ -58,6 +62,9 @@ export default new Vuex.Store({
     },
     removeWorkoutBottomSheet({ commit }) {
       commit('removeWorkoutBottomSheet')
+    },
+    setRoutine({ commit }, payload) {
+      commit('setRoutine', payload)
     },
   },
   modules: {

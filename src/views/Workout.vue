@@ -8,6 +8,17 @@
     <v-row>
       <v-divider class="pb-4"></v-divider>
     </v-row>
+    <v-row
+      v-if="$store.state.isExistWorkoutBottomSheet"
+      class="mb-4"
+      style="border-radius: 5px; background-color: #e0e0e0"
+      justify="center"
+    >
+      <div class="pa-3 font-weight-bold" align="center">
+        진행중인 워크아웃이 있을 경우, <br />
+        새 워크아웃을 시작할 수 없습니다 🧙🏻‍♂️
+      </div>
+    </v-row>
     <v-row>
       <v-col
         class="pa-1"
@@ -38,11 +49,6 @@ export default {
   created() {
     this.loadRoutineData();
   },
-  // watch: {
-  //   routines(nv) {
-  //     console.log("watch routines", nv);
-  //   },
-  // },
   methods: {
     async loadRoutineData() {
       const userUuid = this.$store.state.userUuid;
@@ -50,6 +56,7 @@ export default {
         const res = await this.$http.get(`/api/routine/${userUuid}`);
         if (res.data.success == true) {
           this.routines = res.data.rows;
+          console.log(this.routines);
           this.groupingRoutines();
         } else {
           this.$store.dispatch("popToast", {
@@ -70,30 +77,37 @@ export default {
       let initGroup = {
         routineGroupName: "",
         routineGroupUuid: "",
-        dataOfSet: [],
+        exercises: [],
       };
       let newGroup = {
         routineGroupName: "",
         routineGroupUuid: "",
-        dataOfSet: [],
+        exercises: [],
       };
       this.routines.forEach((oneOfSet, index) => {
         if (newGroup.routineGroupUuid !== oneOfSet.routineGroupUuid) {
+          // newGroup의 uuid와 roof의 uuid가 다를 경우
           if (newGroup.routineGroupUuid !== "") {
+            // newGroup의 uuid가 있을 경우
+            // => 기존에 만든 newGroup을 groupedRoutines에 push
+            // => newGroup을 init(clone)
+            // newGroup의 uuid가 없을 경우는 index가 0인 경우와 같으므로 init을 할 필요가 없음
             this.groupedRoutines.push(newGroup);
             newGroup = Object.assign({}, initGroup);
           }
           newGroup.routineGroupName = oneOfSet.routineGroupName;
           newGroup.routineGroupUuid = oneOfSet.routineGroupUuid;
-          newGroup.dataOfSet.push(oneOfSet);
+          newGroup.exercises.push(oneOfSet);
         } else {
-          newGroup.dataOfSet.push(oneOfSet);
+          // newGroup의 uuid와 roof의 uuid가 같은 경우 => newGroup에 push
+          newGroup.exercises.push(oneOfSet);
         }
 
         if (index === this.routines.length - 1) {
           this.groupedRoutines.push(newGroup);
         }
       });
+      console.log(this.groupedRoutines);
     },
     makeNewRoutine() {
       this.$store.dispatch("createWorkoutBottomSheet", "create");
