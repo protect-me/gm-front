@@ -1,24 +1,31 @@
 <template>
   <v-container class="pt-0 px-2 pb-14">
+    <v-row
+      v-if="$store.state.isExistWorkoutBottomSheet"
+      style="border-radius: 5px; background-color: #e0e0e0"
+      justify="center"
+    >
+      <div class="pa-3 font-weight-medium" align="center">
+        진행 중인 워크아웃이 있을 경우, <br />
+        새 워크아웃을 시작하거나 <br />
+        새 루틴을 만들 수 없습니다 🧙🏻‍♂️
+      </div>
+    </v-row>
     <v-row class="py-5">
-      <v-btn block color="primary" large @click="makeNewRoutine">
+      <v-btn
+        block
+        color="primary"
+        large
+        @click="makeNewRoutine"
+        :disabled="$store.state.isExistWorkoutBottomSheet"
+      >
         Make New Routine
       </v-btn>
     </v-row>
     <v-row>
       <v-divider class="pb-4"></v-divider>
     </v-row>
-    <v-row
-      v-if="$store.state.isExistWorkoutBottomSheet"
-      class="mb-4"
-      style="border-radius: 5px; background-color: #e0e0e0"
-      justify="center"
-    >
-      <div class="pa-3 font-weight-bold" align="center">
-        진행중인 워크아웃이 있을 경우, <br />
-        새 워크아웃을 시작할 수 없습니다 🧙🏻‍♂️
-      </div>
-    </v-row>
+
     <v-row>
       <v-col
         class="pa-1"

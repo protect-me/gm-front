@@ -1,5 +1,5 @@
 <template>
-  <div class="continaer">
+  <div class="wrapper">
     <v-card>
       <v-card-title> 득근 | 得筋 </v-card-title>
       <v-card-subtitle>
@@ -44,6 +44,19 @@
         </div>
       </v-expand-transition>
     </v-card>
+
+    <v-container>
+      <v-row>
+        <v-col
+          class="pa-1"
+          v-for="recordsGroup in groupedRecords"
+          :key="recordsGroup.recordsGroupUuid"
+          cols="12"
+        >
+          <RecordCard :recordsGroup="recordsGroup"> </RecordCard>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
@@ -51,25 +64,27 @@
 import { mapState } from "vuex";
 import Login from "@/components/history/Login";
 import SignUp from "@/components/history/SignUp";
+import RecordCard from "@/components/history/RecordCard";
 
 export default {
   components: {
     Login,
     SignUp,
+    RecordCard,
   },
   computed: {
     ...mapState(["userId", "userUuid"]),
   },
   data() {
     return {
-      hells: [
-        {
-          name: "hell",
-        },
-      ],
       signUpExpand: false,
       loginExpand: false,
+      records: [],
+      groupedRecords: [],
     };
+  },
+  created() {
+    this.loadRecordsData();
   },
   methods: {
     openSignUpExpand() {
@@ -90,12 +105,70 @@ export default {
     async logout() {
       if (confirm("로그아웃하시겠습니까? 🧙🏻‍♂")) {
         await this.$store.dispatch("resetUserInfo");
-        // alert("로그아웃되었습니다 🧙🏻‍♂");
         this.$store.dispatch("popToast", {
           msg: "로그아웃되었습니다 🧙🏻‍♂",
           color: "primary",
         });
       }
+    },
+    async loadRecordsData() {
+      const userUuid = this.$store.state.userUuid;
+      try {
+        const res = await this.$http.get(`/api/records/${userUuid}`);
+        if (res.data.success == true) {
+          this.records = res.data.rows;
+          console.log("records", this.records);
+          this.groupingRecords();
+        } else {
+          this.$store.dispatch("popToast", {
+            msg: `데이터를 가져오는데 실패했습니다.(401) ${err}`,
+            color: "error",
+          });
+          console.log(err);
+        }
+      } catch (err) {
+        this.$store.dispatch("popToast", {
+          msg: `데이터를 가져오는데 실패했습니다.(500) ${err}`,
+          color: "error",
+        });
+        console.log(err);
+      }
+    },
+    groupingRecords() {
+      let initGroup = {
+        routineGroupName: "",
+        recordsGroupUuid: "",
+        startTime: "",
+        endTime: "",
+        exercises: [],
+      };
+      let newGroup = {
+        routineGroupName: "",
+        recordsGroupUuid: "",
+        startTime: "",
+        endTime: "",
+        exercises: [],
+      };
+      this.records.forEach((oneOfSet, index) => {
+        if (newGroup.recordsGroupUuid !== oneOfSet.recordsGroupUuid) {
+          if (newGroup.recordsGroupUuid !== "") {
+            this.groupedRecords.push(newGroup);
+            newGroup = Object.assign({}, initGroup);
+          }
+          newGroup.routineGroupName = oneOfSet.routineGroupName;
+          newGroup.recordsGroupUuid = oneOfSet.recordsGroupUuid;
+          newGroup.startTime = oneOfSet.startTime;
+          newGroup.endTime = oneOfSet.endTime;
+          newGroup.exercises.push(oneOfSet);
+        } else {
+          newGroup.exercises.push(oneOfSet);
+        }
+
+        if (index === this.records.length - 1) {
+          this.groupedRecords.push(newGroup);
+        }
+      });
+      console.log("groupedRecords", this.groupedRecords);
     },
   },
 };

@@ -7,7 +7,7 @@
         !isExistWorkoutBottomSheet || workoutBottomSheetMode == 'create'
       "
     >
-      WORKOUT 👆🏻
+      WORKOUT
     </v-btn>
 
     <v-bottom-sheet
