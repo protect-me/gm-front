@@ -9,6 +9,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "core-js": "^3.15.2",
+    "moment": "^2.29.1",
     "sortable.js": "^0.3.0",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
