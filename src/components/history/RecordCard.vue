@@ -15,17 +15,10 @@
     </v-card-title>
     <!-- class="pb-0 px-2" -->
     <v-card-subtitle class="pb-0">
-      <!-- <DisplayTime :time="recordsGroup.startTime"></DisplayTime>
-      <DisplayTime :time="recordsGroup.endTime"></DisplayTime> -->
-
-      <!-- <div>{{ recordsGroup.startTime }}</div>
-      <div>{{ this.$moment(recordsGroup.startTime).toDate() }}</div>
-      <div>
-        {{ this.$moment(recordsGroup.startTime).toDate().toLocaleDateString() }}
-      </div> -->
-      <div>
-        {{ this.$moment(recordsGroup.startTime).format("YYYY.MM.DD. dddd") }}
-      </div>
+      {{ this.$moment(recordsGroup.startTime).format("YYYY.MM.DD dddd HH:MM") }}
+    </v-card-subtitle>
+    <v-card-subtitle class="pt-0 pb-0">
+      {{ duration }}
     </v-card-subtitle>
     <v-card-subtitle class="pt-0">
       <div>총 {{ totalCountOfExercise }} 운동 · {{ totalCountOfSet }} 세트</div>
@@ -62,6 +55,17 @@ export default {
     },
   },
   computed: {
+    duration() {
+      const startTime = this.$moment(this.recordsGroup.startTime);
+      const endTime = this.$moment(this.recordsGroup.endTime);
+      const diff = endTime.diff(startTime, "minutes");
+      const displayHH = Math.floor(diff / 60);
+      const displayMM = diff % 60;
+
+      return displayHH == 0
+        ? `${displayMM}분`
+        : `${displayHH}시간 ${displayMM}분`;
+    },
     totalCountOfExercise() {
       const lastIndex = this.recordsGroup.exercises.length - 1;
       return this.recordsGroup.exercises[lastIndex].countOfExercise;
