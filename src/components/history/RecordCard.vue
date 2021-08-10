@@ -15,7 +15,7 @@
     </v-card-title>
     <!-- class="pb-0 px-2" -->
     <v-card-subtitle class="pb-0">
-      {{ this.$moment(recordsGroup.startTime).format("YYYY.MM.DD. dddd") }}
+      {{ this.$moment(recordsGroup.startTime).format("YYYY.MM.DD dddd HH:MM") }}
     </v-card-subtitle>
     <v-card-subtitle class="pt-0 pb-0">
       {{ duration }}

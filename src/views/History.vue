@@ -5,7 +5,7 @@
       <v-card-subtitle>
         <strong>점진적 과부하</strong>를 관리하고 득근을 경험하세요🧙🏻‍♂️
       </v-card-subtitle>
-      <v-card-text>
+      <v-card-text v-if="!$store.state.userId">
         <ul>
           <li>중량 과부하</li>
           <li>반복 횟수 증가</li>
@@ -45,7 +45,18 @@
       </v-expand-transition>
     </v-card>
 
-    <v-container>
+    <v-container class="pb-14">
+      <v-row
+        v-if="!$store.state.userId && !loginExpand"
+        class="mt-1"
+        style="border-radius: 5px; background-color: #e0e0e0"
+        justify="center"
+      >
+        <div class="notice pa-3 font-weight-medium" align="center">
+          ID와 PW만으로 간편하게 가입 🧙🏻‍♂️<br />
+          로그인하시면 운동 기록이 나타납니다:)
+        </div>
+      </v-row>
       <v-row>
         <v-col
           class="pa-1"
@@ -101,18 +112,22 @@ export default {
       payload.userId = userId;
       payload.userUuid = userUuid;
       await this.$store.dispatch("setUserInfo", payload);
+      this.loadRecordsData();
     },
     async logout() {
       if (confirm("로그아웃하시겠습니까? 🧙🏻‍♂")) {
         await this.$store.dispatch("resetUserInfo");
-        this.$store.dispatch("popToast", {
+        await this.$store.dispatch("popToast", {
           msg: "로그아웃되었습니다 🧙🏻‍♂",
           color: "primary",
         });
+        this.records = [];
+        this.groupedRecords = [];
       }
     },
     async loadRecordsData() {
       const userUuid = this.$store.state.userUuid;
+      if (!userUuid) return;
       try {
         const res = await this.$http.get(`/api/records/${userUuid}`);
         if (res.data.success == true) {
