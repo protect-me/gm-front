@@ -2,13 +2,22 @@
   <v-container class="pt-0 px-2 pb-14">
     <v-row
       v-if="$store.state.isExistWorkoutBottomSheet"
-      style="border-radius: 5px; background-color: #e0e0e0"
-      justify="center"
+      class="px-8"
+      style="border-radius: 5px; background-color: #e0e0e0; diplay: flex"
     >
-      <div class="notice pa-3 font-weight-medium" align="center">
+      <!-- justify-content: space-between; -->
+      <!-- justify="center" -->
+      <div
+        class="notice pa-3 font-weight-medium"
+        align="center"
+        style="flex-grow: 1"
+      >
         진행 중인 워크아웃이 있을 경우, <br />
         새 워크아웃을 시작하거나 <br />
         새 루틴을 만들 수 없습니다 🧙🏻‍♂️
+      </div>
+      <div style="display: flex; justify-content: center; align-items: center">
+        <div class="text-h4">👆🏻</div>
       </div>
     </v-row>
     <v-row class="py-5">
