@@ -17,7 +17,7 @@
         새 루틴을 만들 수 없습니다 🧙🏻‍♂️
       </div>
       <div style="display: flex; justify-content: center; align-items: center">
-        <div class="text-h4">👆🏻</div>
+        <div class="text-h4">{{ fingerUp }}</div>
       </div>
     </v-row>
     <v-row class="py-5">
@@ -74,6 +74,15 @@ export default {
       routines: [],
       groupedRoutines: [],
     };
+  },
+  computed: {
+    fingerUp() {
+      const arr = ["👆🏻", "👆🏼", "👆🏽", "👆🏾", "👆🏿"];
+      function getRandomIntInclusive(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+      return arr[getRandomIntInclusive(0, 4)];
+    },
   },
   created() {
     this.loadRoutineData();
