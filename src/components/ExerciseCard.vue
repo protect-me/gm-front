@@ -137,7 +137,10 @@ export default {
   },
   mounted() {
     // 여기에서 userUuid, exerciseUuid를 들고 database에서 history를 뒤져서 가져와야할 듯
-    this.initDataOfSet();
+    if (this.$store.state.workoutBottomSheetMode == "create") {
+      // create | record
+      this.initDataOfSet();
+    }
     this.initHeader();
   },
   watch: {
