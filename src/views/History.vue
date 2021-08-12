@@ -77,8 +77,20 @@
           :key="recordsGroup.recordsGroupUuid"
           cols="12"
         >
-          <RecordCard :recordsGroup="recordsGroup"> </RecordCard>
+          <div @click.stop="openRecordDetailDialog(recordsGroup)">
+            <RecordCard :recordsGroup="recordsGroup"> </RecordCard>
+          </div>
         </v-col>
+
+        <v-dialog
+          v-if="recordDetailDialog"
+          v-model="recordDetailDialog"
+          max-width="300xp"
+          width="90vw"
+          scrollable
+        >
+          <RecordDetail :recordsGroup="selectedRecordGroup"></RecordDetail>
+        </v-dialog>
       </v-row>
     </v-container>
   </div>
@@ -89,12 +101,14 @@ import { mapState } from "vuex";
 import Login from "@/components/history/Login";
 import SignUp from "@/components/history/SignUp";
 import RecordCard from "@/components/history/RecordCard";
+import RecordDetail from "@/components/history/RecordDetail";
 
 export default {
   components: {
     Login,
     SignUp,
     RecordCard,
+    RecordDetail,
   },
   computed: {
     ...mapState(["userId", "userUuid"]),
@@ -105,12 +119,18 @@ export default {
       loginExpand: false,
       records: [],
       groupedRecords: [],
+      recordDetailDialog: false,
+      selectedRecordGroup: {},
     };
   },
   created() {
     this.loadRecordsData();
   },
   methods: {
+    openRecordDetailDialog(recordsGroup) {
+      this.selectedRecordGroup = recordsGroup;
+      this.recordDetailDialog = true;
+    },
     openSignUpExpand() {
       if (this.loginExpand) this.loginExpand = false;
       this.signUpExpand = !this.signUpExpand;
