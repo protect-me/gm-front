@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title> 득근 | 得筋 </v-card-title>
       <v-card-subtitle>
-        <strong>점진적 과부하</strong>를 관리하고 득근을 경험하세요🧙🏻‍♂️
+        <strong>점진적 과부하</strong>를 관리하고 득근을 경험하세요 🧙🏻‍♂️
       </v-card-subtitle>
       <v-card-text v-if="!$store.state.userId">
         <ul>
@@ -15,17 +15,30 @@
         </ul>
       </v-card-text>
       <v-card-actions v-if="!userUuid">
-        <v-spacer></v-spacer>
-        <v-btn
-          :outlined="signUpExpand"
-          color="primary"
-          @click="openSignUpExpand"
-        >
-          가입
-        </v-btn>
-        <v-btn :outlined="loginExpand" color="primary" @click="openLoginExpand">
-          로그인
-        </v-btn>
+        <!-- <v-spacer></v-spacer> -->
+        <div style="display: flex; width: 100%">
+          <div style="width: 100%">
+            <v-btn
+              block
+              :outlined="signUpExpand"
+              color="primary"
+              @click="openSignUpExpand"
+            >
+              가입
+            </v-btn>
+          </div>
+          <v-divider class="mx-3" inset vertical></v-divider>
+          <div style="width: 100%">
+            <v-btn
+              block
+              :outlined="loginExpand"
+              color="primary"
+              @click="openLoginExpand"
+            >
+              로그인
+            </v-btn>
+          </div>
+        </div>
       </v-card-actions>
       <v-card-actions v-else>
         <v-spacer></v-spacer>
@@ -64,8 +77,20 @@
           :key="recordsGroup.recordsGroupUuid"
           cols="12"
         >
-          <RecordCard :recordsGroup="recordsGroup"> </RecordCard>
+          <div @click.stop="openRecordDetailDialog(recordsGroup)">
+            <RecordCard :recordsGroup="recordsGroup"> </RecordCard>
+          </div>
         </v-col>
+
+        <v-dialog
+          v-if="recordDetailDialog"
+          v-model="recordDetailDialog"
+          max-width="300xp"
+          width="90vw"
+          scrollable
+        >
+          <RecordDetail :recordsGroup="selectedRecordGroup"></RecordDetail>
+        </v-dialog>
       </v-row>
     </v-container>
   </div>
@@ -76,12 +101,14 @@ import { mapState } from "vuex";
 import Login from "@/components/history/Login";
 import SignUp from "@/components/history/SignUp";
 import RecordCard from "@/components/history/RecordCard";
+import RecordDetail from "@/components/history/RecordDetail";
 
 export default {
   components: {
     Login,
     SignUp,
     RecordCard,
+    RecordDetail,
   },
   computed: {
     ...mapState(["userId", "userUuid"]),
@@ -92,12 +119,18 @@ export default {
       loginExpand: false,
       records: [],
       groupedRecords: [],
+      recordDetailDialog: false,
+      selectedRecordGroup: {},
     };
   },
   created() {
     this.loadRecordsData();
   },
   methods: {
+    openRecordDetailDialog(recordsGroup) {
+      this.selectedRecordGroup = recordsGroup;
+      this.recordDetailDialog = true;
+    },
     openSignUpExpand() {
       if (this.loginExpand) this.loginExpand = false;
       this.signUpExpand = !this.signUpExpand;

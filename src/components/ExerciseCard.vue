@@ -9,17 +9,20 @@
         <v-icon> mdi-dots-horizontal </v-icon>
       </v-btn>
     </v-card-title>
-    <v-card-title class="py-0 subtitle-1 font-weight-bold">
+    <v-card-title
+      class="pt-0 subtitle-1 font-weight-bold"
+      :class="{ 'pb-0': !exercise.note }"
+    >
       <span class="grab-area">
         {{ exercise.name }}
       </span>
     </v-card-title>
+    <v-card-subtitle class="pb-0" align="left" v-if="exercise.note">
+      <span class="grab-area">
+        {{ exercise.note }}
+      </span>
+    </v-card-subtitle>
     <v-card-text>
-      <v-card-subtitle align="left" class="pa-0" v-if="exercise.note">
-        <span class="grab-area">
-          {{ exercise.note }}
-        </span>
-      </v-card-subtitle>
       <v-data-table
         v-show="tableVisiblity"
         :cKey="cKey"
@@ -137,7 +140,10 @@ export default {
   },
   mounted() {
     // 여기에서 userUuid, exerciseUuid를 들고 database에서 history를 뒤져서 가져와야할 듯
-    this.initDataOfSet();
+    // create | record
+    if (this.$store.state.workoutBottomSheetMode == "create") {
+      this.initDataOfSet();
+    }
     this.initHeader();
   },
   watch: {

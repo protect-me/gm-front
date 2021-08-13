@@ -170,7 +170,7 @@ export default {
     workoutBottomSheetMode: {
       get() {
         this.initData();
-        return this.$store.state.workoutBottomSheetMode;
+        return this.$store.state.workoutBottomSheetMode; // create | record
       },
     },
   },
@@ -196,8 +196,8 @@ export default {
       if (this.$store.state.workoutBottomSheetMode == "record") {
         this.routineGroupName = this.$store.state.routineGroup.routineGroupName;
         this.routineGroupUuid = this.$store.state.routineGroup.routineGroupUuid;
-        this.initExercisesData();
         this.setStartTime();
+        this.initExercisesData();
       }
     },
     initExercisesData() {
@@ -222,8 +222,14 @@ export default {
         dataOfSet: [],
       };
       this.$store.state.routineGroup.exercises.forEach((oneOfSet, index) => {
-        if (index == 0) {
-          // First Set
+        if (newExercise.countOfExercise !== oneOfSet.countOfExercise) {
+          if (newExercise.countOfExercise !== 0) {
+            this.exercises.push(newExercise);
+            newExercise = Object.assign({}, initExercise);
+            newExercise.dataOfSet = []; // Object.assign으로 deep clone이 안되기 때문
+          }
+          newExercise.countOfExercise = oneOfSet.countOfExercise;
+          newExercise.countOfExercise = oneOfSet.countOfExercise;
           newExercise.exerciseUuid = oneOfSet.exerciseUuid;
           newExercise.name = oneOfSet.name;
           newExercise.category = oneOfSet.category;
@@ -231,33 +237,15 @@ export default {
           newExercise.note = oneOfSet.note;
           newExercise.admin = oneOfSet.admin;
           newExercise.dataOfSet.push(oneOfSet);
-          if (this.$store.state.routineGroup.length == 1) {
-            // length가 1일 경우 push
-            this.exercises.push(newExercise); // push
-          }
         } else {
-          // etc Set
-          if (newExercise.countOfExercise == oneOfSet.countOfExercise) {
-            // 앞의 count와 같을 경우
-            newExercise.dataOfSet.push(oneOfSet);
-          } else {
-            // 앞의 count와 다를 경우 => push && init
-            this.exercises.push(newExercise); // push
-            newExercise = Object.assign({}, initExercise); // init
-            newExercise.exerciseUuid = oneOfSet.exerciseUuid;
-            newExercise.name = oneOfSet.name;
-            newExercise.category = oneOfSet.category;
-            newExercise.target = oneOfSet.target;
-            newExercise.note = oneOfSet.note;
-            newExercise.admin = oneOfSet.admin;
-            newExercise.dataOfSet.push(oneOfSet);
-          }
+          newExercise.dataOfSet.push(oneOfSet);
         }
-        if (index == this.$store.state.routineGroup.exercises.length - 1) {
-          // Last Set
-          this.exercises.push(newExercise); // push
+        if (index === this.$store.state.routineGroup.exercises.length - 1) {
+          this.exercises.push(newExercise);
         }
       });
+      console.log("1", this.$store.state.routineGroup.exercises);
+      console.log("2", this.exercises);
     },
     setStartTime() {
       // this.startTime = new Date().toISOString().slice(0, 19).replace("T", " ");
@@ -328,10 +316,6 @@ export default {
         }
       });
       this.save();
-      // test print
-      // this.newRoutine.forEach((item) => {
-      //   console.log(item);
-      // });
     },
     async save() {
       try {

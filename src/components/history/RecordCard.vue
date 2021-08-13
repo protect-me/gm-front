@@ -13,9 +13,8 @@
         <v-icon> mdi-dots-horizontal </v-icon>
       </v-btn>
     </v-card-title>
-    <!-- class="pb-0 px-2" -->
     <v-card-subtitle class="pb-0">
-      {{ this.$moment(recordsGroup.startTime).format("YYYY.MM.DD dddd HH:MM") }}
+      {{ this.$moment(recordsGroup.startTime).format("YYYY.MM.DD (dd) HH:MM") }}
     </v-card-subtitle>
     <v-card-subtitle class="pt-0 pb-0">
       {{ duration }}
@@ -23,21 +22,6 @@
     <v-card-subtitle class="pt-0">
       <div>총 {{ totalCountOfExercise }} 운동 · {{ totalCountOfSet }} 세트</div>
     </v-card-subtitle>
-    <!-- <v-card-actions class="pb-0">
-      <v-spacer></v-spacer>
-      <v-btn
-        color="blue darken-1"
-        text
-        x-large
-        @click="workoutStart"
-        :disabled="$store.state.isExistWorkoutBottomSheet"
-      >
-        <span class="mr-2">START</span>
-        <v-icon>mdi-arrow-right-circle-outline </v-icon>
-      </v-btn>
-    </v-card-actions> -->
-    <!-- <v-card-subtitle> </v-card-subtitle> -->
-    <!-- <v-card-title>{{ routineGroup.routineGroupUuid }}</v-card-title> -->
   </v-card>
 </template>
 
