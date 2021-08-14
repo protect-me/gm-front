@@ -109,7 +109,7 @@
                 @updateExerciseSet="updateExerciseSet($event, exerciseIndex)"
               ></ExerciseCard>
             </draggable>
-            <div style="display: flex; flex-direction: column">
+            <div style="display: flex; flex-direction: column" class="py-4">
               <v-dialog v-model="exerciseDialog" fullscreen persistant>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
@@ -133,16 +133,34 @@
                   ></Exercise>
                 </v-card>
               </v-dialog>
-              <v-btn
+              <div
                 v-if="workoutBottomSheetMode == 'record'"
-                class="mt-3"
-                color="error"
-                block
-                outlined
-                @click="savePreProcessing"
+                style="display: flex; width: 100%"
               >
-                운동 종료
-              </v-btn>
+                <div style="width: 100%">
+                  <v-btn
+                    class="mt-3"
+                    color="error"
+                    block
+                    outlined
+                    @click="eraseWorkoutSheet"
+                  >
+                    운동 취소
+                  </v-btn>
+                </div>
+                <v-divider class="mx-3" inset vertical></v-divider>
+                <div style="width: 100%">
+                  <v-btn
+                    class="mt-3"
+                    color="error"
+                    block
+                    outlined
+                    @click="savePreProcessing"
+                  >
+                    운동 종료
+                  </v-btn>
+                </div>
+              </div>
             </div>
           </v-card-text>
         </v-card>
@@ -260,7 +278,8 @@ export default {
       this.isFullsreen = true;
     },
     eraseWorkoutSheet() {
-      if (this.exercises > 0) {
+      console.log("here", this.exercises.length);
+      if (this.exercises.length > 0) {
         if (confirm("데이터가 모두 삭제됩니다. 그래도 닫으시겠어요? 🧙🏻‍♂")) {
           this.$store.dispatch("removeWorkoutBottomSheet");
           this.exercises = [];
