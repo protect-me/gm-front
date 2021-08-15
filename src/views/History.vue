@@ -59,6 +59,20 @@
     </v-card>
 
     <v-container class="pb-14">
+      <v-row>
+        <v-divider class="my-5"></v-divider>
+      </v-row>
+      <v-row
+        v-if="$store.state.userId && records.length == 0"
+        class="mt-1"
+        style="border-radius: 5px; background-color: #e0e0e0"
+        justify="center"
+      >
+        <div class="notice pa-3 font-weight-medium" align="center">
+          루틴을 수행한 후 운동을 종료하시면 <br />
+          여기에 기록이 나타납니다 🧙🏻‍♂️
+        </div>
+      </v-row>
       <v-row
         v-if="!$store.state.userId && !loginExpand"
         class="mt-1"
@@ -67,7 +81,7 @@
       >
         <div class="notice pa-3 font-weight-medium" align="center">
           ID와 PW만으로 간편하게 가입 🧙🏻‍♂️<br />
-          로그인하시면 운동 기록이 나타납니다:)
+          로그인하시면 운동 기록이 타납니다:)
         </div>
       </v-row>
       <v-row>
@@ -89,7 +103,10 @@
           width="90vw"
           scrollable
         >
-          <RecordDetail :recordsGroup="selectedRecordGroup"></RecordDetail>
+          <RecordDetail
+            :recordsGroup="selectedRecordGroup"
+            @closeRecordDetail="closeRecordDetail"
+          ></RecordDetail>
         </v-dialog>
       </v-row>
     </v-container>
@@ -130,6 +147,9 @@ export default {
     openRecordDetailDialog(recordsGroup) {
       this.selectedRecordGroup = recordsGroup;
       this.recordDetailDialog = true;
+    },
+    closeRecordDetail() {
+      this.recordDetailDialog = false;
     },
     openSignUpExpand() {
       if (this.loginExpand) this.loginExpand = false;

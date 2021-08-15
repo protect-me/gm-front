@@ -102,7 +102,7 @@ export default {
           // alert(res.data.message); // 성공
           this.$store.dispatch("popToast", {
             msg: res.data.message,
-            color: "error",
+            color: "primary",
           });
           this.$emit("signUpSuccess");
         } else {

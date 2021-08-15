@@ -1,6 +1,18 @@
 <template>
   <v-card>
-    <v-card-title> {{ recordsGroup.routineGroupName }} </v-card-title>
+    <v-card-title>
+      {{ recordsGroup.routineGroupName }}
+      <v-spacer></v-spacer>
+      <v-btn
+        text
+        color="error"
+        class="pa-0"
+        min-width="40px"
+        @click="closeRecordDetail"
+      >
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-card-title>
     <v-card-subtitle
       class="pt-1"
       style="display: flex; justify-content: space-between"
@@ -75,6 +87,10 @@ export default {
     this.initExercisesData();
   },
   methods: {
+    closeRecordDetail() {
+      console.log("here");
+      this.$emit("closeRecordDetail");
+    },
     initExercisesData() {
       let initExercise = {
         countOfExercise: 0,

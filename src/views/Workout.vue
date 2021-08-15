@@ -36,6 +36,16 @@
     </v-row>
 
     <v-row
+      v-if="$store.state.userId && this.groupedRoutines.length == 0"
+      class="mt-4"
+      style="border-radius: 5px; background-color: #e0e0e0"
+      justify="center"
+    >
+      <div class="notice pa-3 font-weight-medium" align="center">
+        새로운 루틴을 만들어보세요 {{ fingerUp }}
+      </div>
+    </v-row>
+    <v-row
       v-if="!$store.state.userId"
       class="mt-4"
       style="border-radius: 5px; background-color: #e0e0e0"
