@@ -31,17 +31,19 @@
         Make New Routine
       </v-btn>
     </v-row>
-    <v-row>
-      <v-divider class="pb-4"></v-divider>
-    </v-row>
-    <v-row class="py-0 py-0">
-      <v-spacer> </v-spacer>
+    <v-row class="mb-2" style="display: flex" height="100px">
+      <div class="ml-2 mr-5" style="flex-grow: 1; line-height: 41px">
+        <v-divider class="my-4"></v-divider>
+      </div>
+      <!-- <div> -->
       <v-switch
         v-model="isCardSizeBlocked"
         inset
+        hide-details
         label="Block"
-        class="my-0 py-0 mr-2"
+        class="my-0 mr-2"
       ></v-switch>
+      <!-- </div> -->
     </v-row>
 
     <v-row
