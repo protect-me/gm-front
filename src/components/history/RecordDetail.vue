@@ -13,19 +13,13 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-card-title>
-    <v-card-subtitle
-      class="pt-1"
-      style="display: flex; justify-content: space-between"
-    >
-      <div class="startTime">
-        {{
-          this.$moment(recordsGroup.startTime).format("YYYY.MM.DD (dd) HH:MM")
-        }}
-      </div>
-      <div class="duration">
-        <v-icon small>mdi-timer-outline</v-icon> {{ duration }}
-      </div>
+    <v-card-subtitle class="pb-0">
+      {{ this.$moment(recordsGroup.startTime).format("YYYY.MM.DD (dd) HH:MM") }}
     </v-card-subtitle>
+    <v-card-subtitle>
+      <v-icon small>mdi-timer-outline</v-icon> {{ duration }}
+    </v-card-subtitle>
+
     <v-card-text class="pb-0">
       <v-divider></v-divider>
     </v-card-text>
