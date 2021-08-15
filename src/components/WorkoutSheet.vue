@@ -240,6 +240,8 @@ export default {
         dataOfSet: [],
       };
       this.$store.state.routineGroup.exercises.forEach((oneOfSet, index) => {
+        oneOfSet.status = 0;
+        oneOfSet.color = "grey";
         if (newExercise.countOfExercise !== oneOfSet.countOfExercise) {
           if (newExercise.countOfExercise !== 0) {
             this.exercises.push(newExercise);
@@ -262,11 +264,10 @@ export default {
           this.exercises.push(newExercise);
         }
       });
-      console.log("1", this.$store.state.routineGroup.exercises);
-      console.log("2", this.exercises);
+      // console.log("1", this.$store.state.routineGroup.exercises);
+      // console.log("2", this.exercises);
     },
     setStartTime() {
-      // this.startTime = new Date().toISOString().slice(0, 19).replace("T", " ");
       this.startTime = new Date().toISOString().slice(0, 19).replace("T", " ");
     },
     updateCKey() {
@@ -278,7 +279,6 @@ export default {
       this.isFullsreen = true;
     },
     eraseWorkoutSheet() {
-      console.log("here", this.exercises.length);
       if (this.exercises.length > 0) {
         if (confirm("데이터가 모두 삭제됩니다. 그래도 닫으시겠어요? 🧙🏻‍♂")) {
           this.$store.dispatch("removeWorkoutBottomSheet");
@@ -317,21 +317,33 @@ export default {
         ++countOfExercise;
         let countOfSet = 0;
         const dataOfSet = exercise.dataOfSet;
-        for (const item in dataOfSet) {
-          const newLine = [];
-          newLine.push(
-            routineGroupName,
-            userUuid,
-            exercise.exerciseUuid,
-            countOfExercise,
-            ++countOfSet,
-            dataOfSet[item].plusWeight,
-            dataOfSet[item].minusWeight,
-            dataOfSet[item].lap,
-            dataOfSet[item].timeMin,
-            dataOfSet[item].timeSec
-          );
-          this.newRoutine.push(newLine);
+        for (const oneOfSet in dataOfSet) {
+          // create mode => true
+          // record mode && status == 1or2 => true
+          // record mode && status == 0 => false
+          if (
+            this.workoutBottomSheetMode == "create" ||
+            (this.workoutBottomSheetMode == "record" &&
+              dataOfSet[oneOfSet].status !== 0)
+          ) {
+            const newLine = [];
+            newLine.push(
+              routineGroupName,
+              userUuid,
+              exercise.exerciseUuid,
+              countOfExercise,
+              ++countOfSet,
+              dataOfSet[oneOfSet].plusWeight,
+              dataOfSet[oneOfSet].minusWeight,
+              dataOfSet[oneOfSet].lap,
+              dataOfSet[oneOfSet].timeMin,
+              dataOfSet[oneOfSet].timeSec
+            );
+            if (this.workoutBottomSheetMode == "record") {
+              newLine.push(dataOfSet[oneOfSet].status);
+            }
+            this.newRoutine.push(newLine);
+          }
         }
       });
       this.save();

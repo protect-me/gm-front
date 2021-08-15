@@ -55,7 +55,6 @@ export default {
   },
   methods: {
     workoutStart() {
-      console.log("workout!!!");
       this.$store.dispatch("createWorkoutBottomSheet", "record");
       this.$store.dispatch("showWorkoutBottomSheet");
       this.$store.dispatch("setRoutine", this.routineGroup);

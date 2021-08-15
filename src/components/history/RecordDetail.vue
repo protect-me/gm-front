@@ -127,6 +127,7 @@ export default {
           newExercise.target = oneOfSet.target;
           newExercise.note = oneOfSet.note;
           newExercise.admin = oneOfSet.admin;
+          newExercise.status = oneOfSet.status;
           newExercise.dataOfSet.push(oneOfSet);
         } else {
           newExercise.dataOfSet.push(oneOfSet);
@@ -142,6 +143,7 @@ export default {
       if (oneOfSet.minusWeight) text += ` -${oneOfSet.minusWeight}kg`;
       if (oneOfSet.lap) text += ` x ${oneOfSet.lap}`;
       if (oneOfSet.timeMin) text += ` ${oneOfSet.timeMin}: ${oneOfSet.timeSec}`;
+      if (oneOfSet.status == 2) text += ` (F)`;
       return text;
     },
   },
