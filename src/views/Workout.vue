@@ -151,6 +151,7 @@ export default {
             // newGroup의 uuid가 없을 경우는 index가 0인 경우와 같으므로 init을 할 필요가 없음
             this.groupedRoutines.push(newGroup);
             newGroup = Object.assign({}, initGroup);
+            newGroup.exercises = []; // Object.assign으로 deep clone이 안되기 때문
           }
           newGroup.routineGroupName = oneOfSet.routineGroupName;
           newGroup.routineGroupUuid = oneOfSet.routineGroupUuid;
@@ -159,8 +160,8 @@ export default {
           // newGroup의 uuid와 roof의 uuid가 같은 경우 => newGroup에 push
           newGroup.exercises.push(oneOfSet);
         }
-
         if (index === this.routines.length - 1) {
+          // 마지막 인덱스일 경우 push
           this.groupedRoutines.push(newGroup);
         }
       });

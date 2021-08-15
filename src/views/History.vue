@@ -222,6 +222,7 @@ export default {
           if (newGroup.recordsGroupUuid !== "") {
             this.groupedRecords.push(newGroup);
             newGroup = Object.assign({}, initGroup);
+            newExercise.exercises = []; // Object.assign으로 deep clone이 안되기 때문
           }
           newGroup.routineGroupName = oneOfSet.routineGroupName;
           newGroup.recordsGroupUuid = oneOfSet.recordsGroupUuid;
