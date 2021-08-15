@@ -175,6 +175,7 @@ import ExerciseCard from "@/components/ExerciseCard";
 import StopWatch from "@/utils/StopWatch";
 import draggable from "vuedraggable";
 import { mapState } from "vuex";
+import { BUS } from "@/plugins/EventBus";
 
 export default {
   components: {
@@ -386,7 +387,17 @@ export default {
         });
         console.log(err);
       } finally {
+        this.$store.dispatch("removeWorkoutBottomSheet");
+        this.cKey = 0;
+        this.exercises = [];
         this.newRoutine = [];
+        this.editIndex = -1;
+        this.routineGroupName = "New Routine";
+        this.routineGroupUuid = "";
+        this.startTime = "";
+        if (this.workoutBottomSheetMode == "create") {
+          BUS.$emit("reloadRoutineData");
+        }
       }
     },
   },

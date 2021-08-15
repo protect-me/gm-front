@@ -74,6 +74,7 @@
 
 <script>
 import RoutineCard from "@/components/RoutineCard";
+import { BUS } from "@/plugins/EventBus";
 
 export default {
   components: {
@@ -96,6 +97,13 @@ export default {
   },
   created() {
     this.loadRoutineData();
+  },
+  mounted() {
+    BUS.$on("reloadRoutineData", () => {
+      this.routines = [];
+      this.groupedRoutines = [];
+      this.loadRoutineData();
+    });
   },
   methods: {
     async loadRoutineData() {
