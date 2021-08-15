@@ -34,6 +34,15 @@
     <v-row>
       <v-divider class="pb-4"></v-divider>
     </v-row>
+    <v-row class="py-0 py-0">
+      <v-spacer> </v-spacer>
+      <v-switch
+        v-model="isCardSizeBlocked"
+        inset
+        label="Block"
+        class="my-0 py-0 mr-2"
+      ></v-switch>
+    </v-row>
 
     <v-row
       v-if="$store.state.userId && this.groupedRoutines.length == 0"
@@ -63,9 +72,9 @@
         class="pa-1"
         v-for="routineGroup in groupedRoutines"
         :key="routineGroup.routineGroupUuid"
-        cols="6"
+        :cols="isCardSizeBlocked ? 12 : 6"
       >
-        <!-- :cols="card.flex" -->
+        <!-- cols="6" -->
         <RoutineCard :routineGroup="routineGroup"> </RoutineCard>
       </v-col>
     </v-row>
@@ -84,6 +93,7 @@ export default {
     return {
       routines: [],
       groupedRoutines: [],
+      isCardSizeBlocked: false,
     };
   },
   computed: {
