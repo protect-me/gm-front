@@ -54,6 +54,7 @@
             hide-details
             reverse
             type="number"
+            @click="$event.target.select()"
             @input="emitData"
           ></v-text-field>
         </template>
@@ -66,6 +67,7 @@
             reverse
             hide-details
             type="number"
+            @click="$event.target.select()"
             @input="emitData"
           ></v-text-field>
         </template>
@@ -79,6 +81,7 @@
               reverse
               hide-details
               type="number"
+              @click="$event.target.select()"
               @input="emitData"
             ></v-text-field>
             <div class="py-2 px-1">:</div>
@@ -90,6 +93,7 @@
               reverse
               hide-details
               type="number"
+              @click="$event.target.select()"
               @input="emitData"
             ></v-text-field>
           </div>
@@ -103,6 +107,7 @@
             reverse
             hide-details
             type="number"
+            @click="$event.target.select()"
             @input="emitData"
           ></v-text-field>
         </template>
@@ -196,6 +201,8 @@ export default {
         lap: 0,
         timeMin: 0,
         timeSec: 0,
+        status: 0,
+        color: "grey",
       });
       this.emitData();
     },
@@ -237,12 +244,12 @@ export default {
           value: "setCount",
           sortable: false,
         },
-        {
-          text: "Prev",
-          align: "center",
-          value: "prev",
-          sortable: false,
-        },
+        // {
+        //   text: "Prev",
+        //   align: "center",
+        //   value: "prev",
+        //   sortable: false,
+        // },
       ];
       if (this.$store.state.workoutBottomSheetMode == "create") {
         this.headers.push({
