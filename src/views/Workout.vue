@@ -35,15 +35,13 @@
       <div class="ml-2 mr-5" style="flex-grow: 1; line-height: 41px">
         <v-divider class="my-4"></v-divider>
       </div>
-      <!-- <div> -->
       <v-switch
-        v-model="isCardSizeBlocked"
+        v-model="cardFullSize"
         inset
         hide-details
-        label="Block"
+        label="Full"
         class="my-0 mr-2"
       ></v-switch>
-      <!-- </div> -->
     </v-row>
 
     <v-row
@@ -74,7 +72,7 @@
         class="pa-1"
         v-for="routineGroup in groupedRoutines"
         :key="routineGroup.routineGroupUuid"
-        :cols="isCardSizeBlocked ? 12 : 6"
+        :cols="cardFullSize ? 12 : 6"
       >
         <!-- cols="6" -->
         <RoutineCard :routineGroup="routineGroup"> </RoutineCard>
@@ -95,7 +93,7 @@ export default {
     return {
       routines: [],
       groupedRoutines: [],
-      isCardSizeBlocked: false,
+      cardFullSize: false,
     };
   },
   computed: {
