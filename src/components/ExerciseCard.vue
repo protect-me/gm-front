@@ -64,7 +64,7 @@
           <div style="display: flex">
             <v-text-field
               v-model.number="item.timeMin"
-              style="width: 12px; margin: 0 auto"
+              style="width: 25px; margin: 0 auto"
               outlined
               dense
               reverse
@@ -75,7 +75,7 @@
             <div class="py-2 px-1">:</div>
             <v-text-field
               v-model.number="item.timeSec"
-              style="width: 12px; margin: 0 auto"
+              style="width: 25px; margin: 0 auto"
               outlined
               dense
               reverse
@@ -88,7 +88,7 @@
         <template v-slot:[`item.lap`]="{ item }">
           <v-text-field
             v-model.number="item.lap"
-            style="display: block; width: 40px; margin: 0 auto"
+            style="display: block; width: 45px; margin: 0 auto"
             outlined
             dense
             reverse
@@ -106,6 +106,19 @@
           >
             mdi-delete
           </v-icon>
+        </template>
+        <template v-slot:[`item.status`]="{ item }">
+          <v-btn
+            v-model="item.status"
+            class="pa-0 elevation-1"
+            outlined
+            min-width="36px"
+            :color="item.color"
+            @click="changeSetStatus(item)"
+          >
+            <!--  0: empty | 1: success | 2: fail -->
+            <v-icon>mdi-check-outline</v-icon>
+          </v-btn>
         </template>
       </v-data-table>
       <v-btn
@@ -217,14 +230,23 @@ export default {
           value: "prev",
           sortable: false,
         },
-        {
+      ];
+      if (this.$store.state.workoutBottomSheetMode == "create") {
+        this.headers.push({
           text: "X",
           align: "center",
           value: "actions",
           sortable: false,
-        },
-      ];
-
+        });
+      } else if (this.$store.state.workoutBottomSheetMode == "record") {
+        this.headers.push({
+          text: "✔", // check status
+          align: "right",
+          value: "status",
+          class: "headers-status",
+          sortable: false,
+        });
+      }
       this.checkExerciseCategory();
 
       this.exerciseType.forEach((type) => {
@@ -251,6 +273,8 @@ export default {
         {},
         this.exercise.dataOfSet[lastOfDataOfSet]
       );
+      newSet.status = "0";
+      newSet.color = "grey";
       this.exercise.dataOfSet.push(newSet);
       const refresh = JSON.parse(JSON.stringify(this.exercise.dataOfSet));
       this.$emit("updateExerciseSet", refresh);
@@ -265,6 +289,13 @@ export default {
     emitData() {
       this.$emit("updateExerciseSet", this.exercise.dataOfSet);
     },
+    changeSetStatus(item) {
+      item.status = item.status == 0 ? 1 : item.status == 1 ? 2 : 0; // 0: empty | 1: success | 2: fail
+      item.color =
+        item.status == 0 ? "grey" : item.status == 1 ? "primary" : "error";
+      this.$forceUpdate();
+      this.emitData();
+    },
   },
 };
 </script>
@@ -273,6 +304,10 @@ export default {
 .exercise-block-data-table {
   th {
     padding: 0px 10px !important;
+  }
+  th.headers-status {
+    /* text-align: center !important; */
+    padding-right: 22px !important;
   }
   td {
     padding: 0px 10px !important;

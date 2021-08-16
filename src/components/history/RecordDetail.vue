@@ -13,19 +13,13 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-card-title>
-    <v-card-subtitle
-      class="pt-1"
-      style="display: flex; justify-content: space-between"
-    >
-      <div class="startTime">
-        {{
-          this.$moment(recordsGroup.startTime).format("YYYY.MM.DD (dd) HH:MM")
-        }}
-      </div>
-      <div class="duration">
-        <v-icon small>mdi-timer-outline</v-icon> {{ duration }}
-      </div>
+    <v-card-subtitle class="pb-0">
+      {{ this.$moment(recordsGroup.startTime).format("YYYY.MM.DD (dd) HH:MM") }}
     </v-card-subtitle>
+    <v-card-subtitle>
+      <v-icon small>mdi-timer-outline</v-icon> {{ duration }}
+    </v-card-subtitle>
+
     <v-card-text class="pb-0">
       <v-divider></v-divider>
     </v-card-text>
@@ -127,6 +121,7 @@ export default {
           newExercise.target = oneOfSet.target;
           newExercise.note = oneOfSet.note;
           newExercise.admin = oneOfSet.admin;
+          newExercise.status = oneOfSet.status;
           newExercise.dataOfSet.push(oneOfSet);
         } else {
           newExercise.dataOfSet.push(oneOfSet);
@@ -142,6 +137,7 @@ export default {
       if (oneOfSet.minusWeight) text += ` -${oneOfSet.minusWeight}kg`;
       if (oneOfSet.lap) text += ` x ${oneOfSet.lap}`;
       if (oneOfSet.timeMin) text += ` ${oneOfSet.timeMin}: ${oneOfSet.timeSec}`;
+      if (oneOfSet.status == 2) text += ` (F)`;
       return text;
     },
   },
