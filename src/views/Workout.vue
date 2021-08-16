@@ -123,7 +123,6 @@ export default {
         const res = await this.$http.get(`/api/routine/${userUuid}`);
         if (res.data.success == true) {
           this.routines = res.data.rows;
-          console.log(this.routines);
           this.groupingRoutines();
         } else {
           this.$store.dispatch("popToast", {
@@ -175,7 +174,6 @@ export default {
           this.groupedRoutines.push(newGroup);
         }
       });
-      console.log(this.groupedRoutines);
     },
     makeNewRoutine() {
       this.$store.dispatch("createWorkoutBottomSheet", "create");
