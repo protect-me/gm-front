@@ -58,7 +58,13 @@
             persistant
           >
             <template v-slot:activator="{ on, attrs }">
-              <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
+              <v-btn
+                color="primary"
+                class="mb-2"
+                v-bind="attrs"
+                v-on="on"
+                :disabled="!$store.state.userId"
+              >
                 New
               </v-btn>
             </template>

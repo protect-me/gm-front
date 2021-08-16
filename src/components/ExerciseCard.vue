@@ -5,9 +5,18 @@
         {{ exercise.target }} | {{ exercise.category }}
       </v-chip>
       <v-spacer></v-spacer>
-      <v-btn text min-width="40px" class="pa-0">
-        <v-icon> mdi-dots-horizontal </v-icon>
-      </v-btn>
+      <v-menu offset-y left>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn text min-width="40px" class="pa-0" v-bind="attrs" v-on="on">
+            <v-icon> mdi-dots-horizontal </v-icon>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item @click="$emit('deleteExercise')">
+            종목 삭제
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </v-card-title>
     <v-card-title
       class="pt-0 subtitle-1 font-weight-bold"
@@ -45,6 +54,7 @@
             hide-details
             reverse
             type="number"
+            @click="$event.target.select()"
             @input="emitData"
           ></v-text-field>
         </template>
@@ -57,6 +67,7 @@
             reverse
             hide-details
             type="number"
+            @click="$event.target.select()"
             @input="emitData"
           ></v-text-field>
         </template>
@@ -70,6 +81,7 @@
               reverse
               hide-details
               type="number"
+              @click="$event.target.select()"
               @input="emitData"
             ></v-text-field>
             <div class="py-2 px-1">:</div>
@@ -81,6 +93,7 @@
               reverse
               hide-details
               type="number"
+              @click="$event.target.select()"
               @input="emitData"
             ></v-text-field>
           </div>
@@ -94,6 +107,7 @@
             reverse
             hide-details
             type="number"
+            @click="$event.target.select()"
             @input="emitData"
           ></v-text-field>
         </template>
@@ -154,7 +168,11 @@ export default {
   mounted() {
     // 여기에서 userUuid, exerciseUuid를 들고 database에서 history를 뒤져서 가져와야할 듯
     // create | record
-    if (this.$store.state.workoutBottomSheetMode == "create") {
+
+    if (
+      this.$store.state.workoutBottomSheetMode == "create" ||
+      !this.exercise["dataOfSet"]
+    ) {
       this.initDataOfSet();
     }
     this.initHeader();
@@ -183,6 +201,8 @@ export default {
         lap: 0,
         timeMin: 0,
         timeSec: 0,
+        status: 0,
+        color: "grey",
       });
       this.emitData();
     },
@@ -224,12 +244,12 @@ export default {
           value: "setCount",
           sortable: false,
         },
-        {
-          text: "Prev",
-          align: "center",
-          value: "prev",
-          sortable: false,
-        },
+        // {
+        //   text: "Prev",
+        //   align: "center",
+        //   value: "prev",
+        //   sortable: false,
+        // },
       ];
       if (this.$store.state.workoutBottomSheetMode == "create") {
         this.headers.push({

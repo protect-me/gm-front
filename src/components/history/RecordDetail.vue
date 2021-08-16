@@ -82,7 +82,6 @@ export default {
   },
   methods: {
     closeRecordDetail() {
-      console.log("here");
       this.$emit("closeRecordDetail");
     },
     initExercisesData() {

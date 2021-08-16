@@ -185,7 +185,6 @@ export default {
         const res = await this.$http.get(`/api/records/${userUuid}`);
         if (res.data.success == true) {
           this.records = res.data.rows;
-          console.log("records", this.records);
           this.groupingRecords();
         } else {
           this.$store.dispatch("popToast", {
@@ -222,7 +221,7 @@ export default {
           if (newGroup.recordsGroupUuid !== "") {
             this.groupedRecords.push(newGroup);
             newGroup = Object.assign({}, initGroup);
-            newExercise.exercises = []; // Object.assign으로 deep clone이 안되기 때문
+            newGroup.exercises = []; // Object.assign으로 deep clone이 안되기 때문
           }
           newGroup.routineGroupName = oneOfSet.routineGroupName;
           newGroup.recordsGroupUuid = oneOfSet.recordsGroupUuid;
@@ -237,7 +236,6 @@ export default {
           this.groupedRecords.push(newGroup);
         }
       });
-      console.log("groupedRecords", this.groupedRecords);
     },
   },
 };
