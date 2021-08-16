@@ -9,9 +9,20 @@
         {{ recordsGroup.routineGroupName }}
       </div>
       <v-spacer></v-spacer>
-      <v-btn text min-width="40px" class="pa-0">
-        <v-icon> mdi-dots-horizontal </v-icon>
-      </v-btn>
+      <v-menu offset-y left>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn text min-width="40px" class="pa-0" v-bind="attrs" v-on="on">
+            <v-icon> mdi-dots-horizontal </v-icon>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item
+            @click="$emit('deleteRecord', recordsGroup.recordsGroupUuid)"
+          >
+            <v-icon color="error">mdi-delete</v-icon>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </v-card-title>
     <v-card-subtitle class="pb-0">
       {{ this.$moment(recordsGroup.startTime).format("YYYY.MM.DD (dd) HH:mm") }}

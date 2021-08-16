@@ -75,7 +75,11 @@
         :cols="cardFullSize ? 12 : 6"
       >
         <!-- cols="6" -->
-        <RoutineCard :routineGroup="routineGroup"> </RoutineCard>
+        <RoutineCard
+          :routineGroup="routineGroup"
+          @deleteRoutine="deleteRoutine"
+        >
+        </RoutineCard>
       </v-col>
     </v-row>
   </v-container>
@@ -178,6 +182,37 @@ export default {
     makeNewRoutine() {
       this.$store.dispatch("createWorkoutBottomSheet", "create");
       this.$store.dispatch("showWorkoutBottomSheet");
+    },
+    async deleteRoutine(routineGroupUuid) {
+      if (!confirm("복구가 불가능합니다. 그래도 삭제하시겠습니까? 🧙🏻‍♂️")) {
+        return;
+      }
+      try {
+        const res = await this.$http.delete(`/api/routine/${routineGroupUuid}`);
+        if (res.data.success == true) {
+          this.$store.dispatch("popToast", {
+            msg: `루틴을 삭제했습니다 🧙🏻‍♂️`,
+            color: "primary",
+          });
+          this.routines = this.routines.filter((routine) => {
+            return routine.routineGroupUuid !== routineGroupUuid;
+          });
+          this.groupedRoutines = [];
+          this.groupingRoutines();
+        } else {
+          this.$store.dispatch("popToast", {
+            msg: `루틴 삭제에 실패했습니다.(401) ${err}`,
+            color: "error",
+          });
+          console.log(err);
+        }
+      } catch (err) {
+        this.$store.dispatch("popToast", {
+          msg: `루틴 삭제에 실패했습니다.(500) ${err}`,
+          color: "error",
+        });
+        console.log(err);
+      }
     },
   },
 };

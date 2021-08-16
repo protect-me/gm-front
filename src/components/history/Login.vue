@@ -15,6 +15,7 @@
             label="비밀번호 | Password"
             type="password"
             required
+            @keyup.enter="validate"
           ></v-text-field>
         </v-container>
       </v-form>

@@ -13,7 +13,7 @@
         </template>
         <v-list>
           <v-list-item @click="$emit('deleteExercise')">
-            종목 삭제
+            <v-icon color="error">mdi-delete</v-icon>
           </v-list-item>
         </v-list>
       </v-menu>
