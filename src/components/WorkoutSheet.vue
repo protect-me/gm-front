@@ -107,6 +107,7 @@
                 :cKey="cKey"
                 :tableVisiblity="tableVisiblity"
                 @updateExerciseSet="updateExerciseSet($event, exerciseIndex)"
+                @deleteExercise="deleteExercise(exerciseIndex)"
               ></ExerciseCard>
             </draggable>
             <div style="display: flex; flex-direction: column" class="py-4">
@@ -265,8 +266,6 @@ export default {
           this.exercises.push(newExercise);
         }
       });
-      // console.log("1", this.$store.state.routineGroup.exercises);
-      // console.log("2", this.exercises);
     },
     setStartTime() {
       this.startTime = new Date().toISOString().slice(0, 19).replace("T", " ");
@@ -283,11 +282,11 @@ export default {
       if (this.exercises.length > 0) {
         if (confirm("데이터가 모두 삭제됩니다. 그래도 닫으시겠어요? 🧙🏻‍♂")) {
           this.$store.dispatch("removeWorkoutBottomSheet");
-          this.exercises = [];
+          this.removeData();
         }
       } else {
         this.$store.dispatch("removeWorkoutBottomSheet");
-        this.exercises = [];
+        this.removeData();
       }
     },
     closeBottomSheet() {
@@ -306,6 +305,9 @@ export default {
     updateExerciseSet($event, exerciseIndex) {
       this.exercises[exerciseIndex].dataOfSet = $event;
       this.updateCKey();
+    },
+    deleteExercise(exerciseIndex) {
+      this.exercises.splice(exerciseIndex, 1);
     },
     savePreProcessing() {
       if (this.workoutBottomSheetMode == "record") {
@@ -388,17 +390,20 @@ export default {
         console.log(err);
       } finally {
         this.$store.dispatch("removeWorkoutBottomSheet");
-        this.cKey = 0;
-        this.exercises = [];
-        this.newRoutine = [];
-        this.editIndex = -1;
-        this.routineGroupName = "New Routine";
-        this.routineGroupUuid = "";
-        this.startTime = "";
+        this.removeData();
         if (this.workoutBottomSheetMode == "create") {
           BUS.$emit("reloadRoutineData");
         }
       }
+    },
+    removeData() {
+      this.cKey = 0;
+      this.exercises = [];
+      this.newRoutine = [];
+      this.editIndex = -1;
+      this.routineGroupName = "New Routine";
+      this.routineGroupUuid = "";
+      this.startTime = "";
     },
   },
 };

@@ -5,9 +5,18 @@
         {{ exercise.target }} | {{ exercise.category }}
       </v-chip>
       <v-spacer></v-spacer>
-      <v-btn text min-width="40px" class="pa-0">
-        <v-icon> mdi-dots-horizontal </v-icon>
-      </v-btn>
+      <v-menu offset-y left>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn text min-width="40px" class="pa-0" v-bind="attrs" v-on="on">
+            <v-icon> mdi-dots-horizontal </v-icon>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item @click="$emit('deleteExercise')">
+            종목 삭제
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </v-card-title>
     <v-card-title
       class="pt-0 subtitle-1 font-weight-bold"
