@@ -349,7 +349,16 @@ export default {
           }
         }
       });
-      this.save();
+      if (this.newRoutine.length > 0) {
+        this.save();
+      } else {
+        this.$store.dispatch("removeWorkoutBottomSheet");
+        this.removeData();
+        this.$store.dispatch("popToast", {
+          msg: `수행한 세트가 없기 때문에 운동이 취소되었습니다 🧙🏻‍♂️`,
+          color: "error",
+        });
+      }
     },
     async save() {
       try {
