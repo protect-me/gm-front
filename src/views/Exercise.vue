@@ -278,16 +278,6 @@ export default {
       }
     },
   },
-
-  // watch: {
-  //   dialog(val) {
-  //     val || this.initData("edit");
-  //   },
-  //   dialogDelete(val) {
-  //     val || this.initData("delete");
-  //   },
-  // },
-
   created() {
     this.addAdminAction();
     this.loadExerciseData();
@@ -355,21 +345,18 @@ export default {
           `/api/exercise/delete/${this.editedItem.exerciseUuid}`
         );
         if (res.data.success == true) {
-          // alert(res.data.message); // 성공
           this.$store.dispatch("popToast", {
             msg: res.data.message,
             color: "error",
           });
           this.exercises.splice(this.editedIndex, 1);
         } else {
-          // alert(res.data.message); // 실패
           this.$store.dispatch("popToast", {
             msg: `Regist Failed(401) ${err}`,
             color: "error",
           });
         }
       } catch (err) {
-        // alert("Delete Failed(500)", err);
         this.$store.dispatch("popToast", {
           msg: `Delete Failed(500) ${err}`,
           color: "error",

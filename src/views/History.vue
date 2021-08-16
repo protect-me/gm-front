@@ -74,7 +74,7 @@
         </div>
       </v-row>
       <v-row
-        v-if="!$store.state.userId && !loginExpand"
+        v-if="!$store.state.userId && !loginExpand && !signUpExpand"
         class="mt-1"
         style="border-radius: 5px; background-color: #e0e0e0"
         justify="center"
