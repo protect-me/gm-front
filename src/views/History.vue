@@ -92,7 +92,10 @@
           cols="12"
         >
           <div @click.stop="openRecordDetailDialog(recordsGroup)">
-            <RecordCard :recordsGroup="recordsGroup"> </RecordCard>
+            <RecordCard
+              :recordsGroup="recordsGroup"
+              @deleteRecord="deleteRecord"
+            ></RecordCard>
           </div>
         </v-col>
 
@@ -236,6 +239,37 @@ export default {
           this.groupedRecords.push(newGroup);
         }
       });
+    },
+    async deleteRecord(recordsGroupUuid) {
+      if (!confirm("복구가 불가능합니다. 그래도 삭제하시겠습니까? 🧙🏻‍♂️")) {
+        return;
+      }
+      try {
+        const res = await this.$http.delete(`/api/records/${recordsGroupUuid}`);
+        if (res.data.success == true) {
+          this.$store.dispatch("popToast", {
+            msg: `기록을 삭제했습니다 🧙🏻‍♂️`,
+            color: "primary",
+          });
+          this.records = this.records.filter((record) => {
+            return record.recordsGroupUuid !== recordsGroupUuid;
+          });
+          this.groupedRecords = [];
+          this.groupingRecords();
+        } else {
+          this.$store.dispatch("popToast", {
+            msg: `기록 삭제에 실패했습니다.(401) ${err}`,
+            color: "error",
+          });
+          console.log(err);
+        }
+      } catch (err) {
+        this.$store.dispatch("popToast", {
+          msg: `기록 삭제에 실패했습니다.(500) ${err}`,
+          color: "error",
+        });
+        console.log(err);
+      }
     },
   },
 };

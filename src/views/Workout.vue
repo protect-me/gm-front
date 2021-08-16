@@ -184,7 +184,7 @@ export default {
       this.$store.dispatch("showWorkoutBottomSheet");
     },
     async deleteRoutine(routineGroupUuid) {
-      if (!confirm("복구가 불가능합니다. 그래도 루틴을 삭제하시겠습니까? 🧙🏻‍♂️")) {
+      if (!confirm("복구가 불가능합니다. 그래도 삭제하시겠습니까? 🧙🏻‍♂️")) {
         return;
       }
       try {
@@ -194,10 +194,9 @@ export default {
             msg: `루틴을 삭제했습니다 🧙🏻‍♂️`,
             color: "primary",
           });
-          const deleteIndex = this.routines.findIndex(
-            (routine) => routine.routineGroupUuid == routineGroupUuid
-          );
-          this.routines.splice(deleteIndex, 1);
+          this.routines = this.routines.filter((routine) => {
+            return routine.routineGroupUuid !== routineGroupUuid;
+          });
           this.groupedRoutines = [];
           this.groupingRoutines();
         } else {
