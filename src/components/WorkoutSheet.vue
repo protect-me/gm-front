@@ -282,7 +282,7 @@ export default {
       });
     },
     setStartTime() {
-      this.startTime = new Date().toISOString().slice(0, 19).replace("T", " ");
+      this.startTime = this.$moment().format("YYYY-MM-DD H:mm:ss");
     },
     updateCKey() {
       this.cKey++;
@@ -392,10 +392,7 @@ export default {
         reqData.newRoutine = this.newRoutine;
         reqData.startTime = this.startTime;
         reqData.routineGroupUuid = this.routineGroupUuid;
-        reqData.endTime = new Date()
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " ");
+        reqData.endTime = this.$moment().format("YYYY-MM-DD H:mm:ss");
         let url = ``;
         if (this.workoutBottomSheetMode == "create") {
           url = `/api/routine/regist`;
