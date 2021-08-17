@@ -16,6 +16,9 @@
           </v-btn>
         </template>
         <v-list>
+          <v-list-item @click="initRecordTime">
+            <v-icon color="error">mdi-pencil</v-icon>
+          </v-list-item>
           <v-list-item
             @click="$emit('deleteRecord', recordsGroup.recordsGroupUuid)"
           >
@@ -23,6 +26,72 @@
           </v-list-item>
         </v-list>
       </v-menu>
+      <v-dialog
+        v-if="updateRecordTimeDialog"
+        v-model="updateRecordTimeDialog"
+        transition="dialog-top-transition"
+        max-width="350"
+      >
+        <v-card>
+          <v-card-title class="title"> 운동 시간 수정 </v-card-title>
+
+          <v-card-text class="pt-5">
+            <v-container>
+              <v-row class="subtitle"> 시작 시간 </v-row>
+              <v-row class="pb-5">
+                <v-col
+                  class="pa-0"
+                  v-for="(item, index) in editedStartTime"
+                  :key="index"
+                >
+                  <v-text-field
+                    v-model.number="item.value"
+                    :hint="item.key"
+                    type="number"
+                    class="px-1 centered-input"
+                    @click="$event.target.select()"
+                  >
+                  </v-text-field>
+                </v-col>
+              </v-row>
+
+              <v-row class="subtitle"> 종료 시간 </v-row>
+              <v-row>
+                <v-col
+                  class="pa-0"
+                  v-for="(item, index) in editedEndTime"
+                  :key="index"
+                >
+                  <v-text-field
+                    v-model.number="item.value"
+                    :hint="item.key"
+                    type="number"
+                    class="px-1 centered-input"
+                    @click="$event.target.select()"
+                  >
+                  </v-text-field>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+
+            <v-btn color="error" outlined @click="removeUpdateRecordTimeDialog">
+              취소
+            </v-btn>
+
+            <v-btn
+              color="green darken-1"
+              outlined
+              @click="validateEditedTimeData"
+            >
+              수정
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-card-title>
     <v-card-subtitle class="pb-0">
       {{ this.$moment(recordsGroup.startTime).format("YYYY.MM.DD (dd) HH:mm") }}
@@ -49,6 +118,15 @@ export default {
       default: () => ({}),
     },
   },
+  data() {
+    return {
+      updateRecordTimeDialog: false,
+      startTime: [],
+      endTime: [],
+      editedStartTime: [],
+      editedEndTime: [],
+    };
+  },
   computed: {
     duration() {
       const startTime = this.$moment(this.recordsGroup.startTime);
@@ -70,15 +148,70 @@ export default {
     },
   },
   methods: {
-    // workoutStart() {
-    //   console.log("workout!!!");
-    //   this.$store.dispatch("createWorkoutBottomSheet", "record");
-    //   this.$store.dispatch("showWorkoutBottomSheet");
-    //   this.$store.dispatch("setRoutine", this.routineGroup);
-    // },
+    initRecordTime() {
+      const startTime = this.$moment(this.recordsGroup.startTime);
+      const endTime = this.$moment(this.recordsGroup.endTime);
+      this.startTime = [
+        { key: "year", value: startTime.year() },
+        { key: "month", value: startTime.month() + 1 },
+        { key: "date", value: startTime.date() },
+        { key: "hour", value: startTime.hour() },
+        { key: "minute", value: startTime.minute() },
+        { key: "second", value: startTime.second() },
+      ];
+      this.endTime = [
+        { key: "year", value: endTime.year() },
+        { key: "month", value: endTime.month() + 1 },
+        { key: "date", value: endTime.date() },
+        { key: "hour", value: endTime.hour() },
+        { key: "minute", value: endTime.minute() },
+        { key: "second", value: endTime.second() },
+      ];
+      this.initEditedRecordTime();
+    },
+    initEditedRecordTime() {
+      this.editedStartTime = JSON.parse(JSON.stringify(this.startTime));
+      this.editedEndTime = JSON.parse(JSON.stringify(this.endTime));
+      this.updateRecordTimeDialog = true;
+    },
+    modifyToMomentTimeFormat(edidtedTime) {
+      const modifiedTime = {};
+      edidtedTime.forEach((item) => {
+        modifiedTime[item.key] = item.value;
+      });
+      return this.$moment().set(modifiedTime).format("YYYY-MM-DD HH:mm:ss");
+    },
+    validateEditedTimeData() {
+      try {
+        const modifiedStartTime = this.modifyToMomentTimeFormat(
+          this.editedStartTime
+        );
+        const modifiedEndTime = this.modifyToMomentTimeFormat(
+          this.editedEndTime
+        );
+        this.updateRecordsGroupTime();
+      } catch (err) {
+        this.$store.dispatch("popToast", {
+          msg: "운동 시간을 형식에 맞게 입력해주세요 🧙🏻‍♂️",
+          color: "error",
+        });
+        console.log(err);
+      }
+    },
+    async updateRecordsGroupTime() {
+      // To Do
+    },
+    removeUpdateRecordTimeDialog() {
+      this.updateRecordTimeDialog = false;
+      this.editedStartTime = [];
+      this.editedEndTime = [];
+    },
   },
 };
 </script>
 
 <style>
+.centered-input input {
+  text-align: center;
+}
 </style>

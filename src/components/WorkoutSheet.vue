@@ -282,7 +282,7 @@ export default {
       });
     },
     setStartTime() {
-      this.startTime = this.$moment().format("YYYY-MM-DD H:mm:ss");
+      this.startTime = this.$moment().format("YYYY-MM-DD HH:mm:ss");
     },
     updateCKey() {
       this.cKey++;
@@ -392,7 +392,7 @@ export default {
         reqData.newRoutine = this.newRoutine;
         reqData.startTime = this.startTime;
         reqData.routineGroupUuid = this.routineGroupUuid;
-        reqData.endTime = this.$moment().format("YYYY-MM-DD H:mm:ss");
+        reqData.endTime = this.$moment().format("YYYY-MM-DD HH:mm:ss");
         let url = ``;
         if (this.workoutBottomSheetMode == "create") {
           url = `/api/routine/regist`;
