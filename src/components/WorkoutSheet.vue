@@ -4,7 +4,9 @@
       color="primary"
       @click="openBottomSheet"
       :disabled="
-        !isExistWorkoutBottomSheet || workoutBottomSheetMode == 'create'
+        !isExistWorkoutBottomSheet ||
+        workoutBottomSheetMode == 'create' ||
+        workoutBottomSheetMode == 'update'
       "
     >
       WORKOUT
@@ -20,7 +22,12 @@
     >
       <v-sheet class="text-center">
         <v-card>
-          <v-card-title v-if="workoutBottomSheetMode == 'create'">
+          <v-card-title
+            v-if="
+              workoutBottomSheetMode == 'create' ||
+              workoutBottomSheetMode == 'update'
+            "
+          >
             <v-btn
               text
               color="error"
@@ -190,7 +197,7 @@ export default {
     workoutBottomSheetMode: {
       get() {
         this.initData();
-        return this.$store.state.workoutBottomSheetMode; // create | record
+        return this.$store.state.workoutBottomSheetMode; // create | record | update
       },
     },
   },
@@ -206,18 +213,23 @@ export default {
       exerciseDialog: false,
       editIndex: -1,
       routineGroupName: "New Routine",
-      routineGroupUuid: "", // record mode
+      routineGroupUuid: "", // record | update
       startTime: "",
     };
   },
   methods: {
     initData() {
       if (this.exercises.length > 0) return; // 이미 exercises가 있을 경우 return
+      if (this.$store.state.workoutBottomSheetMode !== "create") {
+        // udpate || record
+        if (this.$store.state.routineGroup !== null) {
+          this.routineGroupName = this.$store.state.routineGroup.routineGroupName;
+          this.routineGroupUuid = this.$store.state.routineGroup.routineGroupUuid;
+          this.initExercisesData();
+        }
+      }
       if (this.$store.state.workoutBottomSheetMode == "record") {
-        this.routineGroupName = this.$store.state.routineGroup.routineGroupName;
-        this.routineGroupUuid = this.$store.state.routineGroup.routineGroupUuid;
         this.setStartTime();
-        this.initExercisesData();
       }
     },
     initExercisesData() {
@@ -251,7 +263,6 @@ export default {
             newExercise.dataOfSet = []; // Object.assign으로 deep clone이 안되기 때문
           }
           newExercise.countOfExercise = oneOfSet.countOfExercise;
-          newExercise.countOfExercise = oneOfSet.countOfExercise;
           newExercise.exerciseUuid = oneOfSet.exerciseUuid;
           newExercise.name = oneOfSet.name;
           newExercise.category = oneOfSet.category;
@@ -259,6 +270,9 @@ export default {
           newExercise.note = oneOfSet.note;
           newExercise.admin = oneOfSet.admin;
           newExercise.dataOfSet.push(oneOfSet);
+          if (this.$store.state.workoutBottomSheetMode == "update") {
+            newExercise.routineUuid = oneOfSet.routineUuid;
+          }
         } else {
           newExercise.dataOfSet.push(oneOfSet);
         }
@@ -280,7 +294,11 @@ export default {
     },
     eraseWorkoutSheet() {
       if (this.exercises.length > 0) {
-        if (confirm("데이터가 모두 삭제됩니다. 그래도 닫으시겠어요? 🧙🏻‍♂")) {
+        if (
+          confirm(
+            "입력/수정된 데이터가 모두 초기화됩니다. 그래도 닫으시겠어요? 🧙🏻‍♂"
+          )
+        ) {
           this.$store.dispatch("removeWorkoutBottomSheet");
           this.removeData();
         }
@@ -322,10 +340,12 @@ export default {
         const dataOfSet = exercise.dataOfSet;
         for (const oneOfSet in dataOfSet) {
           // create mode => true
+          // update mode => true
           // record mode && status == 1or2 => true
           // record mode && status == 0 => false
           if (
             this.workoutBottomSheetMode == "create" ||
+            this.workoutBottomSheetMode == "update" ||
             (this.workoutBottomSheetMode == "record" &&
               dataOfSet[oneOfSet].status !== 0)
           ) {
@@ -344,6 +364,9 @@ export default {
             );
             if (this.workoutBottomSheetMode == "record") {
               newLine.push(dataOfSet[oneOfSet].status);
+            }
+            if (this.workoutBottomSheetMode == "update") {
+              newLine.push(this.routineGroupUuid);
             }
             this.newRoutine.push(newLine);
           }
@@ -365,6 +388,7 @@ export default {
         const reqData = {};
         reqData.newRoutine = this.newRoutine;
         reqData.startTime = this.startTime;
+        reqData.routineGroupUuid = this.routineGroupUuid;
         reqData.endTime = new Date()
           .toISOString()
           .slice(0, 19)
@@ -372,8 +396,10 @@ export default {
         let url = ``;
         if (this.workoutBottomSheetMode == "create") {
           url = `/api/routine/regist`;
-        } else {
+        } else if (this.workoutBottomSheetMode == "record") {
           url = `/api/records/regist`;
+        } else if (this.workoutBottomSheetMode == "update") {
+          url = `/api/routine/update`;
         }
         const res = await this.$http.post(url, { reqData });
         if (res.data.success == true) {
@@ -399,8 +425,12 @@ export default {
         console.log(err);
       } finally {
         this.$store.dispatch("removeWorkoutBottomSheet");
+        this.$store.dispatch("setRoutine", null);
         this.removeData();
-        if (this.workoutBottomSheetMode == "create") {
+        if (
+          this.workoutBottomSheetMode == "create" ||
+          this.workoutBottomSheetMode == "update"
+        ) {
           BUS.$emit("reloadRoutineData");
         }
       }

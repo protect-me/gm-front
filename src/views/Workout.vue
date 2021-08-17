@@ -51,7 +51,7 @@
       justify="center"
     >
       <div class="notice pa-3 font-weight-medium" align="center">
-        새로운 루틴을 만들어보세요 {{ fingerUp }}
+        {{ fingerUp }} 새로운 루틴을 만들어보세요
       </div>
     </v-row>
     <v-row
@@ -74,7 +74,6 @@
         :key="routineGroup.routineGroupUuid"
         :cols="cardFullSize ? 12 : 6"
       >
-        <!-- cols="6" -->
         <RoutineCard
           :routineGroup="routineGroup"
           @deleteRoutine="deleteRoutine"
@@ -112,6 +111,7 @@ export default {
   created() {
     this.loadRoutineData();
   },
+
   mounted() {
     BUS.$on("reloadRoutineData", () => {
       this.routines = [];
