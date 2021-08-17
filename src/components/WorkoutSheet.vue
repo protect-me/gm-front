@@ -347,7 +347,10 @@ export default {
             this.workoutBottomSheetMode == "create" ||
             this.workoutBottomSheetMode == "update" ||
             (this.workoutBottomSheetMode == "record" &&
-              dataOfSet[oneOfSet].status !== 0)
+              dataOfSet[oneOfSet].status !== 0 &&
+              (dataOfSet[oneOfSet].lap !== 0 ||
+                dataOfSet[oneOfSet].timeMin !== 0 ||
+                dataOfSet[oneOfSet].timeSec !== 0))
           ) {
             const newLine = [];
             newLine.push(
