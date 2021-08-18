@@ -69,8 +69,8 @@
         justify="center"
       >
         <div class="notice pa-3 font-weight-medium" align="center">
-          루틴을 수행하면 <br />
-          여기에 기록이 나타납니다 🧙🏻‍♂️
+          운동을 수행하면 <br />
+          기록이 나타납니다 🧙🏻‍♂️
         </div>
       </v-row>
       <v-row
@@ -171,8 +171,15 @@ export default {
       this.loadRecordsData();
     },
     async logout() {
-      if (confirm("로그아웃하시겠습니까? 🧙🏻‍♂")) {
+      let noticeText = "로그아웃하시겠습니까? 🧙🏻‍♂";
+      if (this.$store.state.isExistWorkoutBottomSheet) {
+        noticeText =
+          "진행중인 운동 기록이 모두 삭제됩니다. 그래도 로그아웃하시겠습니까? 🧙🏻‍♂";
+      }
+      if (confirm(noticeText)) {
         await this.$store.dispatch("resetUserInfo");
+        await this.$store.dispatch("removeWorkoutBottomSheet");
+        await this.$store.dispatch("setRoutine", null);
         await this.$store.dispatch("popToast", {
           msg: "로그아웃되었습니다 🧙🏻‍♂",
           color: "primary",
