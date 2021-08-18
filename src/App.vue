@@ -1,55 +1,75 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
+    <v-app-bar color="white" app flat>
+      <div class="title">💪🏻💪🏼💪🏽💪🏾💪🏿</div>
       <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
+      <WorkoutSheet></WorkoutSheet>
+      <!-- @fullscreen="BottomNavToMiddle"
+        @halfscreen="BottomNavToTop" -->
     </v-app-bar>
 
     <v-main>
-      <div id="nav">
-        <router-link to="/">Home</router-link> |
-        <router-link to="/login">Login</router-link>
-        <router-link to="/signUp">SignUp</router-link>
-      </div>
-      <router-view />
+      <v-container fluid>
+        <router-view></router-view>
+      </v-container>
     </v-main>
+
+    <v-bottom-navigation :value="value" color="primary" fixed>
+      <!-- :style="bottomNavStyle" -->
+      <v-btn v-for="item in nav" :key="item.title" :to="item.to">
+        <v-icon>{{ item.icon }}</v-icon>
+      </v-btn>
+    </v-bottom-navigation>
+
+    <Toast></Toast>
   </v-app>
 </template>
 
 <script>
-export default {
-  name: "App",
+import WorkoutSheet from "@/components/WorkoutSheet";
+import Toast from "@/utils/Toast";
 
-  data: () => ({
-    //
-  }),
+export default {
+  components: {
+    WorkoutSheet,
+    Toast,
+  },
+  data() {
+    return {
+      workoutSheetDialog: false,
+      value: 1,
+      nav: [
+        {
+          title: "history",
+          icon: "mdi-history",
+          to: "/history",
+        },
+        {
+          title: "workout",
+          icon: "mdi-plus",
+          to: "/",
+        },
+        {
+          title: "exercise",
+          icon: "mdi-dumbbell",
+          to: "/exercise",
+        },
+      ],
+      // bottomNavStyle: {
+      //   zIndex: "6",
+      // },
+    };
+  },
+  methods: {
+    // BottomNavToMiddle() {
+    //   this.bottomNavStyle.zIndex = "6";
+    // },
+    // BottomNavToTop() {
+    //   this.bottomNavStyle.zIndex = "300 !important";
+    // },
+  },
 };
 </script>
+
+<style lang="scss" scoped>
+</style>
