@@ -166,9 +166,6 @@ export default {
     },
   },
   mounted() {
-    // 여기에서 userUuid, exerciseUuid를 들고 database에서 history를 뒤져서 가져와야할 듯
-    // create | record
-
     if (
       this.$store.state.workoutBottomSheetMode == "create" ||
       !this.exercise["dataOfSet"]
@@ -251,7 +248,10 @@ export default {
         //   sortable: false,
         // },
       ];
-      if (this.$store.state.workoutBottomSheetMode == "create") {
+      if (
+        this.$store.state.workoutBottomSheetMode == "create" ||
+        this.$store.state.workoutBottomSheetMode == "update"
+      ) {
         this.headers.push({
           text: "X",
           align: "center",

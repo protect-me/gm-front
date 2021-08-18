@@ -69,7 +69,7 @@
         justify="center"
       >
         <div class="notice pa-3 font-weight-medium" align="center">
-          루틴을 수행한 후 운동을 종료하시면 <br />
+          루틴을 수행하면 <br />
           여기에 기록이 나타납니다 🧙🏻‍♂️
         </div>
       </v-row>

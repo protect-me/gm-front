@@ -11,7 +11,7 @@ export default new Vuex.Store({
     userUuid: "60ec2dda-ef8c-11eb-854b-65b767dc1df8", // admin test
     isShowWorkoutBottomSheet: false,
     isExistWorkoutBottomSheet: false,
-    workoutBottomSheetMode: 'create', // create | record
+    workoutBottomSheetMode: 'create', // create | record | update
     routineGroup: {}
   },
   mutations: { // commit
@@ -32,7 +32,7 @@ export default new Vuex.Store({
     },
     createWorkoutBottomSheet(state, payload) {
       state.isExistWorkoutBottomSheet = true
-      state.workoutBottomSheetMode = payload // create | record
+      state.workoutBottomSheetMode = payload // create | record | update
     },
     removeWorkoutBottomSheet(state) {
       state.isExistWorkoutBottomSheet = false

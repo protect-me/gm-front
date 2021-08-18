@@ -14,11 +14,21 @@
 
       <v-menu offset-y left>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn text min-width="40px" class="pa-0" v-bind="attrs" v-on="on">
+          <v-btn
+            text
+            min-width="40px"
+            class="pa-0"
+            v-bind="attrs"
+            v-on="on"
+            :disabled="$store.state.isExistWorkoutBottomSheet"
+          >
             <v-icon> mdi-dots-horizontal </v-icon>
           </v-btn>
         </template>
         <v-list>
+          <v-list-item @click="workoutUpdate">
+            <v-icon color="error">mdi-pencil</v-icon>
+          </v-list-item>
           <v-list-item
             @click="$emit('deleteRoutine', routineGroup.routineGroupUuid)"
           >
@@ -66,6 +76,11 @@ export default {
   methods: {
     workoutStart() {
       this.$store.dispatch("createWorkoutBottomSheet", "record");
+      this.$store.dispatch("showWorkoutBottomSheet");
+      this.$store.dispatch("setRoutine", this.routineGroup);
+    },
+    workoutUpdate() {
+      this.$store.dispatch("createWorkoutBottomSheet", "update");
       this.$store.dispatch("showWorkoutBottomSheet");
       this.$store.dispatch("setRoutine", this.routineGroup);
     },
