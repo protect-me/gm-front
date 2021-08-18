@@ -177,7 +177,22 @@ export default {
     modifyToMomentTimeFormat(edidtedTime) {
       const modifiedTime = {};
       edidtedTime.forEach((item) => {
-        modifiedTime[item.key] = item.value;
+        if (
+          item.key == "month" &&
+          String(item.value).length <= 2 &&
+          String(item.value).length > 0
+        ) {
+          modifiedTime[item.key] = item.value - 1;
+        } else if (
+          (item.key == "year" && String(item.value).length == 4) ||
+          (item.key !== "year" &&
+            String(item.value).length <= 2 &&
+            String(item.value).length > 0)
+        ) {
+          modifiedTime[item.key] = item.value;
+        } else {
+          throw err;
+        }
       });
       return this.$moment().set(modifiedTime).format("YYYY-MM-DD HH:mm:ss");
     },
@@ -189,17 +204,43 @@ export default {
         const modifiedEndTime = this.modifyToMomentTimeFormat(
           this.editedEndTime
         );
-        this.updateRecordsGroupTime();
+        this.updateRecordsGroupTime(modifiedStartTime, modifiedEndTime);
       } catch (err) {
         this.$store.dispatch("popToast", {
           msg: "운동 시간을 형식에 맞게 입력해주세요 🧙🏻‍♂️",
           color: "error",
         });
-        console.log(err);
       }
     },
-    async updateRecordsGroupTime() {
-      // To Do
+    async updateRecordsGroupTime(modifiedStartTime, modifiedEndTime) {
+      const recordsGroupInfo = {};
+      recordsGroupInfo.recordsGroupUuid = this.recordsGroup.recordsGroupUuid;
+      recordsGroupInfo.modifiedStartTime = modifiedStartTime;
+      recordsGroupInfo.modifiedEndTime = modifiedEndTime;
+      try {
+        const res = await this.$http.put(`/api/records`, { recordsGroupInfo });
+        if (res.data.success == true) {
+          this.$store.dispatch("popToast", {
+            msg: `성공적으로 수정되었습니다 🧙🏻‍♂️`,
+            color: "primary",
+          });
+          this.recordsGroup.startTime = modifiedStartTime;
+          this.recordsGroup.endTime = modifiedEndTime;
+          this.removeUpdateRecordTimeDialog();
+        } else {
+          this.$store.dispatch("popToast", {
+            msg: `데이터를 가져오는데 실패했습니다.(401) ${err}`,
+            color: "error",
+          });
+          console.log(err);
+        }
+      } catch (err) {
+        this.$store.dispatch("popToast", {
+          msg: `데이터를 가져오는데 실패했습니다.(500) ${err}`,
+          color: "error",
+        });
+        console.log(err);
+      }
     },
     removeUpdateRecordTimeDialog() {
       this.updateRecordTimeDialog = false;
